@@ -1,3 +1,6 @@
+using ChatBackend.Data;
+using Microsoft.EntityFrameworkCore;
+
 namespace ChatBackend
 {
     class Program
@@ -5,12 +8,19 @@ namespace ChatBackend
         static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+            string? connectionString = builder.Configuration.GetConnectionString("Database");
+            Console.WriteLine(connectionString);
 
             // Add services to the container.
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
             builder.Services.AddControllers();
+            builder.Services.AddDbContext<ChatDataContext>(options =>
+                options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString))
+                    .EnableDetailedErrors()
+                    .LogTo(Console.WriteLine, LogLevel.Information)
+            );
 
             var app = builder.Build();
 

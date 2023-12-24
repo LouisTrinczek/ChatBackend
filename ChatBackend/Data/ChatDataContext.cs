@@ -6,13 +6,12 @@ using Microsoft.EntityFrameworkCore;
 
 public class ChatDataContext : DbContext
 {
-    // TODO: Add Configuration file or something
-    private readonly string _connectionString = @"Server=localhost; Port=40001; User ID=root; Password=secret; Database=chat";
+    public ChatDataContext(DbContextOptions<ChatDataContext> dbContextOptions) : base(dbContextOptions)
+    {
+    }
 
     public DbSet<User> Users { get; set; } = null!;
-    
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        optionsBuilder.UseMySql(_connectionString, ServerVersion.AutoDetect(_connectionString));
-    }
+    public DbSet<Server> Server { get; set; } = null!;
+    public DbSet<Channel> Channel { get; set; } = null!;
+    public DbSet<Message> Message { get; set; } = null!;
 }
