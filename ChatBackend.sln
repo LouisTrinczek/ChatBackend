@@ -8,6 +8,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chat.API", "src\Chat.API\Ch
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chat.Persistence", "src\Chat.Persistence\Chat.Persistence.csproj", "{C840C76B-6A6E-40E1-A981-0DE8FC7A7497}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatLPCommon", "src\Chat.LP.Common\ChatLPCommon.csproj", "{60E665F4-793B-457B-BEE2-2F6C8BDDC87F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,5 +32,9 @@ Global
 		{C840C76B-6A6E-40E1-A981-0DE8FC7A7497}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C840C76B-6A6E-40E1-A981-0DE8FC7A7497}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C840C76B-6A6E-40E1-A981-0DE8FC7A7497}.Release|Any CPU.Build.0 = Release|Any CPU
+		{60E665F4-793B-457B-BEE2-2F6C8BDDC87F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{60E665F4-793B-457B-BEE2-2F6C8BDDC87F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{60E665F4-793B-457B-BEE2-2F6C8BDDC87F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{60E665F4-793B-457B-BEE2-2F6C8BDDC87F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

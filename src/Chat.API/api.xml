@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Chat.API</name>
+    </assembly>
+    <members>
+        <member name="T:Chat.API.Controllers.UserController">
+            <summary>
+            Provides the REST Endpoints for the User Endpoints such as Login, Registering and user editing
+            </summary>
+        </member>
+        <member name="M:Chat.API.Controllers.UserController.Login">
+            <summary> Authenticates the User with a JWT Token </summary>
+            <response code='200'>Successfully generated JWT Token</response>
+            <response code='401'>Wrong Email, Username or Password</response>
+            <response code='400'>Invalid Email or too Short Password</response>
+        </member>
+        <member name="M:Chat.API.Controllers.UserController.Register">
+            <summary>Creates a new User</summary>
+            <response code='200'>Successfully generated User</response>
+            <response code='400'>Invalid Email or password too Short Password</response>
+            <response code='409'>User with Email or Username already exists</response>
+        </member>
+        <member name="M:Chat.API.Controllers.UserController.Update">
+            <summary>Updates a User</summary>
+            <response code='200'>Successfully Updated User</response>
+            <response code='401'></response>
+        </member>
+    </members>
+</doc>

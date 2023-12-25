@@ -1,0 +1,3 @@
+[submodule "src/Chat.LP.Common"]
+	path = src/Chat.LP.Common
+	url = https://github.com/KevinDanne/ChatLPCommon.git
