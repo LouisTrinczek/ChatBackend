@@ -2,6 +2,7 @@ using System.Diagnostics;
 using Chat.Infrastructure.Interfaces.Swagger;
 using Microsoft.EntityFrameworkCore;
 using Chat.Persistence.Context;
+using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.OpenApi.Models;
 
@@ -56,9 +57,24 @@ Use the interactive Swagger documentation below to explore and test the availabl
 
                 c.OperationFilter<RemoveVersionParameterFilter>();
                 c.DocumentFilter<ReplaceVersionWithExactValueInPathFilter>();
-
+                
+                c.TagActionsBy(api =>
+                {
+                    if (api.GroupName != null)
+                    {
+                        return new[] { api.GroupName };
+                    }
+                    if (api.ActionDescriptor is ControllerActionDescriptor controllerActionDescriptor)
+                    {
+                        return new[] { controllerActionDescriptor.ControllerName };
+                    }
+                    throw new InvalidOperationException("Unable to determine tag for endpoint.");
+                });
+                
+                c.DocInclusionPredicate((name, api) => true);
+                
                 var filePath = Path.GetFullPath("../Chat.API/api.xml");
-                c.IncludeXmlComments(filePath);
+                c.IncludeXmlComments(filePath, true);
             });
             builder.Services.AddControllers();
             builder.Services.AddDbContext<ChatDataContext>(options =>
