@@ -1,8 +1,7 @@
-﻿using ChatBackend.Models;
-
-namespace ChatBackend.Data;
-
+﻿using Chat.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+
+namespace Chat.Persistence.Context;
 
 public class ChatDataContext : DbContext
 {

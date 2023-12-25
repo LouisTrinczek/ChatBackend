@@ -1,7 +1,7 @@
-using ChatBackend.Data;
 using Microsoft.EntityFrameworkCore;
+using Chat.Persistence.Context;
 
-namespace ChatBackend
+namespace Chat.Infrastructure
 {
     class Program
     {

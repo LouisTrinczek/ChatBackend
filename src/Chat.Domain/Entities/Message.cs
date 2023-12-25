@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace ChatBackend.Models;
+namespace Chat.Domain.Entities;
 
 public class Message : BaseEntity
 {
