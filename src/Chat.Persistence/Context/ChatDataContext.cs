@@ -13,4 +13,5 @@ public class ChatDataContext : DbContext
     public DbSet<Server> Server { get; set; } = null!;
     public DbSet<Channel> Channel { get; set; } = null!;
     public DbSet<Message> Message { get; set; } = null!;
+    public DbSet<Friends> Friends { get; set; } = null!;
 }
