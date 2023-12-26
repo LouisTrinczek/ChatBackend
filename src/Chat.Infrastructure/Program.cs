@@ -1,9 +1,11 @@
 using System.Diagnostics;
+using System.Net.WebSockets;
 using Chat.Infrastructure.Interfaces.Swagger;
 using Microsoft.EntityFrameworkCore;
 using Chat.Persistence.Context;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Versioning;
+using Microsoft.AspNetCore.WebSockets;
 using Microsoft.OpenApi.Models;
 
 namespace Chat.Infrastructure
@@ -16,6 +18,7 @@ namespace Chat.Infrastructure
             string? connectionString = builder.Configuration.GetConnectionString("Database");
 
             builder.Services.AddEndpointsApiExplorer();
+            builder.Services.AddRouting(options => options.LowercaseUrls = true);
             builder.Services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1",
@@ -57,31 +60,35 @@ Use the interactive Swagger documentation below to explore and test the availabl
 
                 c.OperationFilter<RemoveVersionParameterFilter>();
                 c.DocumentFilter<ReplaceVersionWithExactValueInPathFilter>();
-                
+
                 c.TagActionsBy(api =>
                 {
                     if (api.GroupName != null)
                     {
                         return new[] { api.GroupName };
                     }
+
                     if (api.ActionDescriptor is ControllerActionDescriptor controllerActionDescriptor)
                     {
                         return new[] { controllerActionDescriptor.ControllerName };
                     }
+
                     throw new InvalidOperationException("Unable to determine tag for endpoint.");
                 });
-                
+
                 c.DocInclusionPredicate((name, api) => true);
-                
+
                 var filePath = Path.GetFullPath("../Chat.API/api.xml");
                 c.IncludeXmlComments(filePath, true);
             });
+            
             builder.Services.AddControllers();
             builder.Services.AddDbContext<ChatDataContext>(options =>
                 options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString))
                     .EnableDetailedErrors()
                     .LogTo(Console.WriteLine, LogLevel.Information)
             );
+            
             builder.Services.AddApiVersioning(api =>
             {
                 api.AssumeDefaultVersionWhenUnspecified = true;
@@ -104,6 +111,7 @@ Use the interactive Swagger documentation below to explore and test the availabl
             }
 
             app.UseHttpsRedirection();
+            app.UseWebSockets();
             app.MapControllers();
             app.Run();
         }

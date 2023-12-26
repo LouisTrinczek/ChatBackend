@@ -39,7 +39,7 @@ public class UsersController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [Produces(typeof(UserDto))]
+    [Produces(typeof(UserResponseDto))]
     [Consumes(MediaTypeNames.Application.Json)]
     public string Login()
     {
