@@ -60,6 +60,8 @@ Use the interactive Swagger documentation below to explore and test the availabl
 
                 c.OperationFilter<RemoveVersionParameterFilter>();
                 c.DocumentFilter<ReplaceVersionWithExactValueInPathFilter>();
+                c.SchemaFilter<RequireNonNullablePropertiesSchemaFilter>();
+                c.SupportNonNullableReferenceTypes();
 
                 c.TagActionsBy(api =>
                 {

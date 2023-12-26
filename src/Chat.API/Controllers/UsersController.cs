@@ -1,8 +1,11 @@
 ﻿using System.Net.Mime;
+using System.Runtime.CompilerServices;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ChatLPCommon.Dtos;
+using ChatLPCommon.Types;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.Formatters;
 
 namespace Chat.API.Controllers;
 
@@ -12,6 +15,7 @@ namespace Chat.API.Controllers;
 [ApiController]
 [ApiVersion("1")]
 [Route("/api/v{version:apiVersion}/[controller]")]
+[Produces(MediaTypeNames.Application.Json)]
 public class UsersController : ControllerBase
 {
     // TODO: Add Correct Request and Response DTOs
@@ -24,24 +28,24 @@ public class UsersController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
-    [Produces(MediaTypeNames.Application.Json)]
-    [Consumes(MediaTypeNames.Application.Json)]
-    public string Register()
+    [Consumes(typeof(UserRegistrationDto), MediaTypeNames.Application.Json)]
+    [Produces(typeof(ApiResponse<string?>))]
+    public string Register([FromBody] UserRegistrationDto userRegistrationDto)
     {
         return "Not Implemented";
     }
-    
+
     /// <summary> Authenticates the User with a JWT Token </summary>
-    /// <response code='200'>Successfully generated JWT Token</response>
+    /// <response code='200'>Successfully generated JWT Token String</response>
     /// <response code='401'>Wrong Email, Username or Password</response>
     /// <response code='400'>Invalid Email or too Short Password</response>
     [HttpPost("login")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [Produces(typeof(UserResponseDto))]
-    [Consumes(MediaTypeNames.Application.Json)]
-    public string Login()
+    [Consumes(typeof(UserLoginDto), MediaTypeNames.Application.Json)]
+    [Produces(typeof(ApiResponse<string>))]
+    public string Login([FromBody] UserLoginDto userLoginDto)
     {
         return "Not Implemented";
     }
@@ -54,10 +58,10 @@ public class UsersController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    [Produces(MediaTypeNames.Application.Json)]
-    [Consumes(MediaTypeNames.Application.Json)]
+    [Consumes(typeof(UserUpdateDto), MediaTypeNames.Application.Json)]
+    [Produces(typeof(ApiResponse<UserResponseDto>))]
     [Authorize]
-    public string Update()
+    public string Update([FromBody] UserUpdateDto userUpdateDto)
     {
         return "Not Implemented";
     }
@@ -70,8 +74,7 @@ public class UsersController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    [Produces(MediaTypeNames.Application.Json)]
-    [Consumes(MediaTypeNames.Application.Json)]
+    [Produces(typeof(ApiResponse<string>))]
     [Authorize]
     public string Delete()
     {
@@ -86,13 +89,13 @@ public class UsersController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    [Produces(MediaTypeNames.Application.Json)]
+    [Produces(ApiResponse<UserResponseDto[]>)]
     [Authorize]
     public string Get()
     {
         return "String";
     }
-    
+
     /// <summary>Writes a Message to a User</summary>
     /// <response code='200'>Successfully sent message</response>
     /// <response code='401'>If the user isn't logged in</response>
@@ -102,13 +105,14 @@ public class UsersController : ControllerBase
     [ApiExplorerSettings(GroupName = "User Messages")]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [Consumes(typeof(ApiResponse<Message>))]
     [Produces(MediaTypeNames.Application.Json)]
     [Authorize]
     public string WriteMessage()
     {
         return "String";
     }
-    
+
     /// <summary>Updates a Message</summary>
     /// <response code='200'>Successfully updated message</response>
     /// <response code='401'>If the user isn't logged in</response>
@@ -124,7 +128,7 @@ public class UsersController : ControllerBase
     {
         return "String";
     }
-    
+
     /// <summary>Deletes A Message</summary>
     /// <response code='200'>Successfully deleted message</response>
     /// <response code='401'>If the user isn't logged in</response>

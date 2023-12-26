@@ -106,19 +106,19 @@
             Provides the REST Endpoints for the User Endpoints such as Login, Registering and user editing
             </summary>
         </member>
-        <member name="M:Chat.API.Controllers.UsersController.Register">
+        <member name="M:Chat.API.Controllers.UsersController.Register(ChatLPCommon.Dtos.UserRegistrationDto)">
             <summary>Creates a new User</summary>
             <response code='200'>Successfully generated User</response>
             <response code='400'>Invalid Email or password too Short Password</response>
             <response code='409'>User with Email or Username already exists</response>
         </member>
-        <member name="M:Chat.API.Controllers.UsersController.Login">
+        <member name="M:Chat.API.Controllers.UsersController.Login(ChatLPCommon.Dtos.UserLoginDto)">
             <summary> Authenticates the User with a JWT Token </summary>
-            <response code='200'>Successfully generated JWT Token</response>
+            <response code='200'>Successfully generated JWT Token String</response>
             <response code='401'>Wrong Email, Username or Password</response>
             <response code='400'>Invalid Email or too Short Password</response>
         </member>
-        <member name="M:Chat.API.Controllers.UsersController.Update">
+        <member name="M:Chat.API.Controllers.UsersController.Update(ChatLPCommon.Dtos.UserUpdateDto)">
             <summary>Updates a User</summary>
             <response code='200'>Successfully Updated User</response>
             <response code='401'>If the user isn't logged in</response>
