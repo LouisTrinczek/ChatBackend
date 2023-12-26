@@ -2,8 +2,8 @@
 using System.Runtime.CompilerServices;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using ChatLPCommon.Dtos;
-using ChatLPCommon.Types;
+using Chat.Common.Dtos;
+using Chat.Common.Types;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Formatters;
 
@@ -89,7 +89,7 @@ public class UsersController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    [Produces(ApiResponse<UserResponseDto[]>)]
+    [Produces(typeof(ApiResponse<UserResponseDto[]>))]
     [Authorize]
     public string Get()
     {
@@ -105,10 +105,10 @@ public class UsersController : ControllerBase
     [ApiExplorerSettings(GroupName = "User Messages")]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    [Consumes(typeof(ApiResponse<Message>))]
-    [Produces(MediaTypeNames.Application.Json)]
+    [Produces(typeof(ApiResponse<MessageResponseDto>))]
+    [Consumes(typeof(MessageCreateDto), MediaTypeNames.Application.Json)]
     [Authorize]
-    public string WriteMessage()
+    public string WriteMessage([FromBody] MessageCreateDto messageCreateDto)
     {
         return "String";
     }
@@ -122,9 +122,10 @@ public class UsersController : ControllerBase
     [ApiExplorerSettings(GroupName = "User Messages")]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    [Produces(MediaTypeNames.Application.Json)]
+    [Produces(typeof(ApiResponse<MessageResponseDto>))]
+    [Consumes(typeof(MessageUpdateDto), MediaTypeNames.Application.Json)]
     [Authorize]
-    public string UpdateMessage()
+    public string UpdateMessage([FromBody] MessageUpdateDto messageUpdateDto)
     {
         return "String";
     }
@@ -138,9 +139,41 @@ public class UsersController : ControllerBase
     [ApiExplorerSettings(GroupName = "User Messages")]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    [Produces(MediaTypeNames.Application.Json)]
+    [Produces(typeof(ApiResponse<string>))]
     [Authorize]
     public string DeleteMessage()
+    {
+        return "String";
+    }
+    
+    /// <summary>Gets a Paginated Chat with a user</summary>
+    /// <response code='200'>Successfully get chat</response>
+    /// <response code='401'>If the user isn't logged in</response>
+    /// <response code='403'>If the user tries to get a chat he's not permitted to</response>
+    [HttpGet("{userId}/messages")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ApiExplorerSettings(GroupName = "User Messages")]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [Produces(typeof(PaginatedApiResponse<MessageResponseDto[]>))]
+    [Authorize]
+    public string GetMessages()
+    {
+        return "String";
+    }
+    
+    /// <summary>Gets all Servers a User is a member of</summary>
+    /// <response code='200'>Successfully get servers</response>
+    /// <response code='401'>If the user isn't logged in</response>
+    /// <response code='403'>If the user tries to get a chat he's not permitted to</response>
+    [HttpGet("{userId}/servers")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ApiExplorerSettings(GroupName = "Users")]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [Produces(typeof(PaginatedApiResponse<MessageResponseDto[]>))]
+    [Authorize]
+    public string GetAllUserServers()
     {
         return "String";
     }

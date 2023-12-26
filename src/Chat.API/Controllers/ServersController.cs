@@ -1,4 +1,6 @@
 ﻿using System.Net.Mime;
+using Chat.Common.Dtos;
+using Chat.Common.Types;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -11,6 +13,7 @@ namespace Chat.API.Controllers;
 [ApiController]
 [ApiVersion("1")]
 [Route("/api/v{version:apiVersion}/[controller]")]
+[Produces(MediaTypeNames.Application.Json)]
 public class ServersController
 {
     /// <summary>Creates a Server</summary>
@@ -19,14 +22,14 @@ public class ServersController
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    [Produces(MediaTypeNames.Application.Json)]
-    [Consumes(MediaTypeNames.Application.Json)]
+    [Produces(typeof(ApiResponse<ServerResponseDto>))]
+    [Consumes(typeof(ServerResponseDto), MediaTypeNames.Application.Json)]
     [Authorize]
-    public string Create()
+    public string Create([FromBody] ServerCreationDto serverCreationDto)
     {
         return "Not Implemented";
     }
-    
+
     /// <summary>Updates a Server</summary>
     /// <response code='200'>Successfully updated Server</response>
     /// <response code='401'>If the user isn't logged in</response>
@@ -35,10 +38,10 @@ public class ServersController
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    [Produces(MediaTypeNames.Application.Json)]
-    [Consumes(MediaTypeNames.Application.Json)]
+    [Produces(typeof(ApiResponse<ServerResponseDto>))]
+    [Consumes(typeof(ServerResponseDto), MediaTypeNames.Application.Json)]
     [Authorize]
-    public string Update()
+    public string Update([FromBody] ServerUpdateDto serverUpdateDto)
     {
         return "Not Implemented";
     }
@@ -51,8 +54,7 @@ public class ServersController
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    [Produces(MediaTypeNames.Application.Json)]
-    [Consumes(MediaTypeNames.Application.Json)]
+    [Produces(typeof(ApiResponse<string>))]
     [Authorize]
     public string Delete()
     {
@@ -67,7 +69,7 @@ public class ServersController
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    [Produces(MediaTypeNames.Application.Json)]
+    [Produces(typeof(ApiResponse<ServerResponseDto>))]
     [Authorize]
     public string Get()
     {

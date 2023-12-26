@@ -1,4 +1,6 @@
 ﻿using System.Net.Mime;
+using Chat.Common.Dtos;
+using Chat.Common.Types;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -10,21 +12,22 @@ namespace Chat.API.Controllers;
 /// </summary>
 [ApiController]
 [ApiVersion("1")]
-[Route("/api/v{version:apiVersion}/users/[controller]")]
+[Route("/api/v{version:apiVersion}/users")]
+[Produces(MediaTypeNames.Application.Json)]
 public class FriendsController
 {
     /// <summary>Adds a Friend</summary>
     /// <response code='200'>Successfully Added Friend</response>
     /// <response code='401'>If the user isn't logged in</response>
     /// <response code='403'>If the user tries to add a friend he's not permitted to</response>
-    [HttpPost("{userId}")]
+    [HttpPost("{userId}/[controller]")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    [Produces(MediaTypeNames.Application.Json)]
-    [Consumes(MediaTypeNames.Application.Json)]
+    [Produces(typeof(ApiResponse<FriendsResponseDto>))]
+    [Consumes(typeof(FriendsRequestDto), MediaTypeNames.Application.Json)]
     [Authorize]
-    public string Add()
+    public string Add([FromBody] FriendsRequestDto friendsRequestDto)
     {
         return "Not Implemented";
     }
@@ -32,10 +35,10 @@ public class FriendsController
     /// <summary>Removes a Friend</summary>
     /// <response code='200'>Successfully removed a friend</response>
     /// <response code='401'>If the user isn't logged in</response>
-    [HttpDelete("{userId}")]
+    [HttpDelete("{userId}/[controller]/{friendId}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    [Produces(MediaTypeNames.Application.Json)]
+    [Produces(typeof(ApiResponse<string>))]
     [Consumes(MediaTypeNames.Application.Json)]
     [Authorize]
     public string Remove()
@@ -47,11 +50,11 @@ public class FriendsController
     /// <response code='200'>Successfully Get Server</response>
     /// <response code='401'>If the user isn't logged in</response>
     /// <response code='403'>If the user tries to get a friend list he's not permitted to</response>
-    [HttpGet("{userId}")]
+    [HttpGet("{userId}/[controller]")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    [Produces(MediaTypeNames.Application.Json)]
+    [Produces(typeof(ApiResponse<FriendsResponseDto[]>))]
     [Authorize]
     public string Get()
     {

@@ -9,13 +9,13 @@
             Provides the REST Endpoints for the Server Channels like Creation, Deletion and Updating
             </summary>
         </member>
-        <member name="M:Chat.API.Controllers.ChannelsController.Create">
+        <member name="M:Chat.API.Controllers.ChannelsController.Create(Chat.Common.Dtos.ServerChannelCreateDto)">
             <summary>Creates a Channel</summary>
             <response code='200'>Successfully Created Channel</response>
             <response code='401'>If the user isn't logged in</response>
             <response code='403'>If the user tries to create a Channel he's not permitted to</response>
         </member>
-        <member name="M:Chat.API.Controllers.ChannelsController.Update">
+        <member name="M:Chat.API.Controllers.ChannelsController.Update(Chat.Common.Dtos.ServerChannelUpdateDto)">
             <summary>Updates a Channel</summary>
             <response code='200'>Successfully Updated Channel</response>
             <response code='401'>If the user isn't logged in</response>
@@ -33,13 +33,19 @@
             <response code='401'>If the user isn't logged in</response>
             <response code='403'>If the user tries to get a Channel he's not permitted to</response>
         </member>
-        <member name="M:Chat.API.Controllers.ChannelsController.WriteMessage">
+        <member name="M:Chat.API.Controllers.ChannelsController.GetAllServerChannels">
+            <summary>Gets all Channels within the server</summary>
+            <response code='200'>Successfully Get all channels a user sees</response>
+            <response code='401'>If the user isn't logged in</response>
+            <response code='403'>If the user tries to get a Servers Channels he's not permitted to</response>
+        </member>
+        <member name="M:Chat.API.Controllers.ChannelsController.WriteMessage(Chat.Common.Dtos.MessageCreateDto)">
             <summary>Writes a Message to a Channel</summary>
             <response code='200'>Successfully sent message</response>
             <response code='401'>If the user isn't logged in</response>
             <response code='403'>If the user tries to write in a channel he's not permitted to</response>
         </member>
-        <member name="M:Chat.API.Controllers.ChannelsController.UpdateMessage">
+        <member name="M:Chat.API.Controllers.ChannelsController.UpdateMessage(Chat.Common.Dtos.MessageUpdateDto)">
             <summary>Updates a Message</summary>
             <response code='200'>Successfully updated message</response>
             <response code='401'>If the user isn't logged in</response>
@@ -51,12 +57,18 @@
             <response code='401'>If the user isn't logged in</response>
             <response code='403'>If the user tries to delete a message he's not permitted to</response>
         </member>
+        <member name="M:Chat.API.Controllers.ChannelsController.GetMessages">
+            <summary>Gets a Paginated Chat from a channel</summary>
+            <response code='200'>Successfully get chat</response>
+            <response code='401'>If the user isn't logged in</response>
+            <response code='403'>If the user tries to get a chat he's not permitted to</response>
+        </member>
         <member name="T:Chat.API.Controllers.FriendsController">
             <summary>
             Provides the REST Endpoints for Friends, such as adding friends, removing friends, and getting a friendlist
             </summary>
         </member>
-        <member name="M:Chat.API.Controllers.FriendsController.Add">
+        <member name="M:Chat.API.Controllers.FriendsController.Add(Chat.Common.Dtos.FriendsRequestDto)">
             <summary>Adds a Friend</summary>
             <response code='200'>Successfully Added Friend</response>
             <response code='401'>If the user isn't logged in</response>
@@ -78,12 +90,12 @@
             Provides the REST Endpoints for the Servers such as Creation, Deletion, and Updating
             </summary>
         </member>
-        <member name="M:Chat.API.Controllers.ServersController.Create">
+        <member name="M:Chat.API.Controllers.ServersController.Create(Chat.Common.Dtos.ServerCreationDto)">
             <summary>Creates a Server</summary>
             <response code='200'>Successfully Created Server</response>
             <response code='401'>If the user isn't logged in</response>
         </member>
-        <member name="M:Chat.API.Controllers.ServersController.Update">
+        <member name="M:Chat.API.Controllers.ServersController.Update(Chat.Common.Dtos.ServerUpdateDto)">
             <summary>Updates a Server</summary>
             <response code='200'>Successfully updated Server</response>
             <response code='401'>If the user isn't logged in</response>
@@ -106,19 +118,19 @@
             Provides the REST Endpoints for the User Endpoints such as Login, Registering and user editing
             </summary>
         </member>
-        <member name="M:Chat.API.Controllers.UsersController.Register(ChatLPCommon.Dtos.UserRegistrationDto)">
+        <member name="M:Chat.API.Controllers.UsersController.Register(Chat.Common.Dtos.UserRegistrationDto)">
             <summary>Creates a new User</summary>
             <response code='200'>Successfully generated User</response>
             <response code='400'>Invalid Email or password too Short Password</response>
             <response code='409'>User with Email or Username already exists</response>
         </member>
-        <member name="M:Chat.API.Controllers.UsersController.Login(ChatLPCommon.Dtos.UserLoginDto)">
+        <member name="M:Chat.API.Controllers.UsersController.Login(Chat.Common.Dtos.UserLoginDto)">
             <summary> Authenticates the User with a JWT Token </summary>
             <response code='200'>Successfully generated JWT Token String</response>
             <response code='401'>Wrong Email, Username or Password</response>
             <response code='400'>Invalid Email or too Short Password</response>
         </member>
-        <member name="M:Chat.API.Controllers.UsersController.Update(ChatLPCommon.Dtos.UserUpdateDto)">
+        <member name="M:Chat.API.Controllers.UsersController.Update(Chat.Common.Dtos.UserUpdateDto)">
             <summary>Updates a User</summary>
             <response code='200'>Successfully Updated User</response>
             <response code='401'>If the user isn't logged in</response>
@@ -136,13 +148,13 @@
             <response code='401'>If the user isn't logged in</response>
             <response code='403'>If the user tries to get a user he's not permitted to</response>
         </member>
-        <member name="M:Chat.API.Controllers.UsersController.WriteMessage">
+        <member name="M:Chat.API.Controllers.UsersController.WriteMessage(Chat.Common.Dtos.MessageCreateDto)">
             <summary>Writes a Message to a User</summary>
             <response code='200'>Successfully sent message</response>
             <response code='401'>If the user isn't logged in</response>
             <response code='403'>If the user tries to write a user he's not permitted to</response>
         </member>
-        <member name="M:Chat.API.Controllers.UsersController.UpdateMessage">
+        <member name="M:Chat.API.Controllers.UsersController.UpdateMessage(Chat.Common.Dtos.MessageUpdateDto)">
             <summary>Updates a Message</summary>
             <response code='200'>Successfully updated message</response>
             <response code='401'>If the user isn't logged in</response>
@@ -153,6 +165,18 @@
             <response code='200'>Successfully deleted message</response>
             <response code='401'>If the user isn't logged in</response>
             <response code='403'>If the user tries to delete a message he's not permitted to</response>
+        </member>
+        <member name="M:Chat.API.Controllers.UsersController.GetMessages">
+            <summary>Gets a Paginated Chat with a user</summary>
+            <response code='200'>Successfully get chat</response>
+            <response code='401'>If the user isn't logged in</response>
+            <response code='403'>If the user tries to get a chat he's not permitted to</response>
+        </member>
+        <member name="M:Chat.API.Controllers.UsersController.GetAllUserServers">
+            <summary>Gets all Servers a User is a member of</summary>
+            <response code='200'>Successfully get servers</response>
+            <response code='401'>If the user isn't logged in</response>
+            <response code='403'>If the user tries to get a chat he's not permitted to</response>
         </member>
     </members>
 </doc>

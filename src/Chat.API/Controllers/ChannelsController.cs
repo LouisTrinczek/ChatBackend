@@ -1,4 +1,6 @@
 ﻿using System.Net.Mime;
+using Chat.Common.Dtos;
+using Chat.Common.Types;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -11,6 +13,7 @@ namespace Chat.API.Controllers;
 [ApiController]
 [ApiVersion("1")]
 [Route("/api/v{version:apiVersion}/servers/{serverId}/[controller]")]
+[Produces(MediaTypeNames.Application.Json)]
 public class ChannelsController
 {
     /// <summary>Creates a Channel</summary>
@@ -21,10 +24,10 @@ public class ChannelsController
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    [Produces(MediaTypeNames.Application.Json)]
-    [Consumes(MediaTypeNames.Application.Json)]
+    [Consumes(typeof(ServerChannelCreateDto), MediaTypeNames.Application.Json)]
+    [Produces(typeof(ApiResponse<ServerChannelResponseDto>))]
     [Authorize]
-    public string Create()
+    public string Create([FromBody] ServerChannelCreateDto serverChannelCreateDto)
     {
         return "Not Implemented";
     }
@@ -37,10 +40,10 @@ public class ChannelsController
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    [Produces(MediaTypeNames.Application.Json)]
-    [Consumes(MediaTypeNames.Application.Json)]
+    [Consumes(typeof(ServerChannelUpdateDto), MediaTypeNames.Application.Json)]
+    [Produces(typeof(ApiResponse<ServerChannelResponseDto>))]
     [Authorize]
-    public string Update()
+    public string Update([FromBody] ServerChannelUpdateDto serverChannelUpdateDto)
     {
         return "Not Implemented";
     }
@@ -53,8 +56,7 @@ public class ChannelsController
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    [Produces(MediaTypeNames.Application.Json)]
-    [Consumes(MediaTypeNames.Application.Json)]
+    [Produces(typeof(ApiResponse<string>))]
     [Authorize]
     public string Delete()
     {
@@ -69,9 +71,24 @@ public class ChannelsController
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    [Produces(MediaTypeNames.Application.Json)]
+    [Produces(typeof(ApiResponse<ServerChannelResponseDto>))]
     [Authorize]
     public string Get()
+    {
+        return "String";
+    }
+    
+    /// <summary>Gets all Channels within the server</summary>
+    /// <response code='200'>Successfully Get all channels a user sees</response>
+    /// <response code='401'>If the user isn't logged in</response>
+    /// <response code='403'>If the user tries to get a Servers Channels he's not permitted to</response>
+    [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [Produces(typeof(ApiResponse<ServerChannelResponseDto[]>))]
+    [Authorize]
+    public string GetAllServerChannels()
     {
         return "String";
     }
@@ -85,9 +102,10 @@ public class ChannelsController
     [ApiExplorerSettings(GroupName = "Channel Messages")]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    [Produces(MediaTypeNames.Application.Json)]
+    [Produces(typeof(ApiResponse<MessageResponseDto>))]
+    [Consumes(typeof(MessageCreateDto), MediaTypeNames.Application.Json)]
     [Authorize]
-    public string WriteMessage()
+    public string WriteMessage([FromBody] MessageCreateDto messageCreateDto)
     {
         return "String";
     }
@@ -101,9 +119,10 @@ public class ChannelsController
     [ApiExplorerSettings(GroupName = "Channel Messages")]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    [Produces(MediaTypeNames.Application.Json)]
+    [Produces(typeof(ApiResponse<MessageResponseDto>))]
+    [Consumes(typeof(MessageUpdateDto), MediaTypeNames.Application.Json)]
     [Authorize]
-    public string UpdateMessage()
+    public string UpdateMessage([FromBody] MessageUpdateDto messageUpdateDto)
     {
         return "String";
     }
@@ -117,9 +136,25 @@ public class ChannelsController
     [ApiExplorerSettings(GroupName = "Channel Messages")]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    [Produces(MediaTypeNames.Application.Json)]
+    [Produces(typeof(ApiResponse<string>))]
     [Authorize]
     public string DeleteMessage()
+    {
+        return "String";
+    }
+    
+    /// <summary>Gets a Paginated Chat from a channel</summary>
+    /// <response code='200'>Successfully get chat</response>
+    /// <response code='401'>If the user isn't logged in</response>
+    /// <response code='403'>If the user tries to get a chat he's not permitted to</response>
+    [HttpGet("{channelId}/messages")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ApiExplorerSettings(GroupName = "Channel Messages")]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [Produces(typeof(PaginatedApiResponse<MessageResponseDto[]>))]
+    [Authorize]
+    public string GetMessages()
     {
         return "String";
     }

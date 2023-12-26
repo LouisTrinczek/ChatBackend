@@ -15,7 +15,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Chat.LP.Common\ChatLPCommon.csproj" />
+      <ProjectReference Include="..\Chat.LP.Common\Chat.Common.csproj" />
     </ItemGroup>
 
 </Project>
