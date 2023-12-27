@@ -9,6 +9,11 @@
             Provides the REST Endpoints for the Server Channels like Creation, Deletion and Updating
             </summary>
         </member>
+        <member name="M:Chat.API.Controllers.ChannelsController.#ctor(Chat.Persistence.Context.ChatDataContext)">
+            <summary>
+            Dependency Injection
+            </summary>
+        </member>
         <member name="M:Chat.API.Controllers.ChannelsController.Create(Chat.Common.Dtos.ServerChannelCreateDto)">
             <summary>Creates a Channel</summary>
             <response code='200'>Successfully Created Channel</response>
@@ -68,6 +73,11 @@
             Provides the REST Endpoints for Friends, such as adding friends, removing friends, and getting a friendlist
             </summary>
         </member>
+        <member name="M:Chat.API.Controllers.FriendsController.#ctor(Chat.Persistence.Context.ChatDataContext)">
+            <summary>
+            Dependency Injection
+            </summary>
+        </member>
         <member name="M:Chat.API.Controllers.FriendsController.Add(Chat.Common.Dtos.FriendsRequestDto)">
             <summary>Adds a Friend</summary>
             <response code='200'>Successfully Added Friend</response>
@@ -88,6 +98,11 @@
         <member name="T:Chat.API.Controllers.ServersController">
             <summary>
             Provides the REST Endpoints for the Servers such as Creation, Deletion, and Updating
+            </summary>
+        </member>
+        <member name="M:Chat.API.Controllers.ServersController.#ctor(Chat.Persistence.Context.ChatDataContext)">
+            <summary>
+            Dependency Injection
             </summary>
         </member>
         <member name="M:Chat.API.Controllers.ServersController.Create(Chat.Common.Dtos.ServerCreationDto)">
@@ -116,6 +131,11 @@
         <member name="T:Chat.API.Controllers.UsersController">
             <summary>
             Provides the REST Endpoints for the User Endpoints such as Login, Registering and user editing
+            </summary>
+        </member>
+        <member name="M:Chat.API.Controllers.UsersController.#ctor(Chat.Persistence.Context.ChatDataContext)">
+            <summary>
+            Dependency Injection
             </summary>
         </member>
         <member name="M:Chat.API.Controllers.UsersController.Register(Chat.Common.Dtos.UserRegistrationDto)">

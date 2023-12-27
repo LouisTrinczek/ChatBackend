@@ -1,6 +1,10 @@
 ﻿using System.Net.Mime;
 using Chat.Common.Dtos;
 using Chat.Common.Types;
+using Chat.Domain;
+using Chat.Domain.Entities;
+using Chat.Persistence.Context;
+using Chat.Persistence.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -16,6 +20,16 @@ namespace Chat.API.Controllers;
 [Produces(MediaTypeNames.Application.Json)]
 public class ServersController
 {
+    private IGenericRepository<Server> _genericRepository;
+
+    /// <summary>
+    /// Dependency Injection
+    /// </summary>
+    public ServersController(ChatDataContext chatDataContext)
+    {
+        _genericRepository = new GenericRepository<Server>(chatDataContext);
+    }
+    
     /// <summary>Creates a Server</summary>
     /// <response code='200'>Successfully Created Server</response>
     /// <response code='401'>If the user isn't logged in</response>

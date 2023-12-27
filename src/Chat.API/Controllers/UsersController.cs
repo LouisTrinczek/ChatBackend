@@ -4,6 +4,10 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Chat.Common.Dtos;
 using Chat.Common.Types;
+using Chat.Domain;
+using Chat.Domain.Entities;
+using Chat.Persistence.Context;
+using Chat.Persistence.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Formatters;
 
@@ -18,7 +22,15 @@ namespace Chat.API.Controllers;
 [Produces(MediaTypeNames.Application.Json)]
 public class UsersController : ControllerBase
 {
-    // TODO: Add Correct Request and Response DTOs
+    private IGenericRepository<User> _genericRepository;
+
+    /// <summary>
+    /// Dependency Injection
+    /// </summary>
+    public UsersController(ChatDataContext chatDataContext)
+    {
+        _genericRepository = new GenericRepository<User>(chatDataContext);
+    }
 
     /// <summary>Creates a new User</summary>
     /// <response code='200'>Successfully generated User</response>

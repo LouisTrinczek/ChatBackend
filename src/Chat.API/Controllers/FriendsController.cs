@@ -1,6 +1,10 @@
 ﻿using System.Net.Mime;
 using Chat.Common.Dtos;
 using Chat.Common.Types;
+using Chat.Domain;
+using Chat.Domain.Entities;
+using Chat.Persistence.Context;
+using Chat.Persistence.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -16,6 +20,16 @@ namespace Chat.API.Controllers;
 [Produces(MediaTypeNames.Application.Json)]
 public class FriendsController
 {
+    private IGenericRepository<Friends> _genericRepository;
+
+    /// <summary>
+    /// Dependency Injection
+    /// </summary>
+    public FriendsController(ChatDataContext chatDataContext)
+    {
+        _genericRepository = new GenericRepository<Friends>(chatDataContext);
+    }
+    
     /// <summary>Adds a Friend</summary>
     /// <response code='200'>Successfully Added Friend</response>
     /// <response code='401'>If the user isn't logged in</response>
