@@ -1,4 +1,6 @@
-﻿namespace Chat.Infrastructure.Builders;
+﻿using Chat.API.Hubs;
+
+namespace Chat.Infrastructure.Builders;
 
 public class AppBuilder
 {
@@ -10,6 +12,8 @@ public class AppBuilder
             app.UseSwagger();
             app.UseSwaggerUI();
         }
+
+        app.MapHub<ChatHub>("/chat");
 
         app.UseHttpsRedirection();
         app.UseWebSockets();

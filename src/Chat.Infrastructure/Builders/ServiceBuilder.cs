@@ -98,5 +98,7 @@ Use the interactive Swagger documentation below to explore and test the availabl
                 new MediaTypeApiVersionReader("ver")
             );
         });
+        
+        builder.Services.AddSignalR();
     }
 }
