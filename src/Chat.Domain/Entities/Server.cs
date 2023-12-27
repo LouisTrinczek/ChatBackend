@@ -5,7 +5,6 @@ namespace Chat.Domain.Entities;
 
 public class Server : BaseEntity
 {
-    [Key] public string Id { get; set; } = Guid.NewGuid().ToString();
     [Column] public string Name { get; set; } = null!;
     [Column] [MaxLength(100)] public string IconUrl { get; set; } = null!;
     public User Owner = null!;

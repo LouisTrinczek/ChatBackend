@@ -5,7 +5,7 @@ namespace Chat.Domain.Entities;
 
 public class User : BaseEntity
 {
-    [Key] [MaxLength(100)] public string Id { get; set; } = Guid.NewGuid().ToString();
+    [Column] [MaxLength(320)] public string Email { get; set; } = null!;
     [Column] [MaxLength(100)] public string Username { get; set; } = null!;
     [Column] [MaxLength(100)] public string Password { get; set; } = null!;
     [Column] [MaxLength(100)] public string AvatarUrl { get; set; } = null!;

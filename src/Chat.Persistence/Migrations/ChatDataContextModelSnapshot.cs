@@ -50,8 +50,7 @@ namespace Chat.Persistence.Migrations
             modelBuilder.Entity("Chat.Domain.Entities.Friends", b =>
                 {
                     b.Property<string>("Id")
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar(100)");
+                        .HasColumnType("varchar(255)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime(6)");
@@ -60,13 +59,13 @@ namespace Chat.Persistence.Migrations
                         .HasColumnType("datetime(6)");
 
                     b.Property<string>("FriendId")
-                        .HasColumnType("varchar(100)");
+                        .HasColumnType("varchar(255)");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime(6)");
 
                     b.Property<string>("UserId")
-                        .HasColumnType("varchar(100)");
+                        .HasColumnType("varchar(255)");
 
                     b.HasKey("Id");
 
@@ -83,7 +82,7 @@ namespace Chat.Persistence.Migrations
                         .HasColumnType("varchar(255)");
 
                     b.Property<string>("AuthorId")
-                        .HasColumnType("varchar(100)");
+                        .HasColumnType("varchar(255)");
 
                     b.Property<string>("ChannelId")
                         .IsRequired()
@@ -131,7 +130,7 @@ namespace Chat.Persistence.Migrations
                         .HasColumnType("datetime(6)");
 
                     b.Property<string>("UserId")
-                        .HasColumnType("varchar(100)");
+                        .HasColumnType("varchar(255)");
 
                     b.HasKey("Id");
 
@@ -143,8 +142,7 @@ namespace Chat.Persistence.Migrations
             modelBuilder.Entity("Chat.Domain.Entities.User", b =>
                 {
                     b.Property<string>("Id")
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar(100)");
+                        .HasColumnType("varchar(255)");
 
                     b.Property<string>("AvatarUrl")
                         .IsRequired()
@@ -156,6 +154,11 @@ namespace Chat.Persistence.Migrations
 
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(320)
+                        .HasColumnType("varchar(320)");
 
                     b.Property<string>("Password")
                         .IsRequired()

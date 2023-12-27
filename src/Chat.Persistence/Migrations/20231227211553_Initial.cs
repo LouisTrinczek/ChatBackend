@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Chat.Persistence.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialMigration : Migration
+    public partial class Initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -18,11 +18,15 @@ namespace Chat.Persistence.Migrations
                 name: "Users",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false)
+                    Id = table.Column<string>(type: "varchar(255)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Email = table.Column<string>(type: "varchar(320)", maxLength: 320, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Username = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Password = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    AvatarUrl = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
@@ -35,6 +39,36 @@ namespace Chat.Persistence.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
+                name: "Friends",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "varchar(255)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    UserId = table.Column<string>(type: "varchar(255)", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    FriendId = table.Column<string>(type: "varchar(255)", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    DeletedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Friends", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Friends_Users_FriendId",
+                        column: x => x.FriendId,
+                        principalTable: "Users",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Friends_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id");
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
                 name: "Server",
                 columns: table => new
                 {
@@ -42,7 +76,9 @@ namespace Chat.Persistence.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Name = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    UserId = table.Column<string>(type: "varchar(100)", nullable: true)
+                    IconUrl = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    UserId = table.Column<string>(type: "varchar(255)", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
@@ -90,7 +126,7 @@ namespace Chat.Persistence.Migrations
                 {
                     Id = table.Column<string>(type: "varchar(255)", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    AuthorId = table.Column<string>(type: "varchar(100)", nullable: true)
+                    AuthorId = table.Column<string>(type: "varchar(255)", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     ChannelId = table.Column<string>(type: "varchar(255)", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -121,6 +157,16 @@ namespace Chat.Persistence.Migrations
                 column: "ServerId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Friends_FriendId",
+                table: "Friends",
+                column: "FriendId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Friends_UserId",
+                table: "Friends",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Message_AuthorId",
                 table: "Message",
                 column: "AuthorId");
@@ -139,6 +185,9 @@ namespace Chat.Persistence.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "Friends");
+
             migrationBuilder.DropTable(
                 name: "Message");
 
