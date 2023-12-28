@@ -1,21 +1,23 @@
 ﻿using Chat.Domain;
 using Chat.Domain.Entities;
 using Chat.Persistence.Context;
+using EntityFramework.Exceptions.Common;
 using Microsoft.EntityFrameworkCore;
 
 namespace Chat.Persistence.Repositories;
 
-public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity
+public class GenericRepository<T> : IGenericRepository<T>
+    where T : BaseEntity
 {
-    private readonly ChatDataContext _context;
-    private readonly DbSet<T> _table;
+    protected readonly ChatDataContext _context;
+    protected readonly DbSet<T> _table;
 
     public GenericRepository(ChatDataContext chatDataContext)
     {
         _context = chatDataContext;
         _table = _context.Set<T>();
     }
-    
+
     public IEnumerable<T> GetAll()
     {
         return _table.ToList();
@@ -34,7 +36,7 @@ public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity
     public void Update(T obj)
     {
         obj.UpdatedAt = new DateTime();
-        
+
         _table.Attach(obj);
         _context.Entry(obj).State = EntityState.Modified;
     }
@@ -42,7 +44,7 @@ public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity
     public void Delete(object id)
     {
         var existing = _table.Find(id);
-        
+
         _table.Remove(existing!);
     }
 

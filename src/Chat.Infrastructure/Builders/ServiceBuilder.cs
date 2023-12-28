@@ -1,5 +1,6 @@
 ﻿using Chat.Infrastructure.Interfaces.Swagger;
 using Chat.Persistence.Context;
+using EntityFramework.Exceptions.MySQL;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.EntityFrameworkCore;
@@ -17,11 +18,13 @@ public static class ServiceBuilder
         builder.Services.AddRouting(options => options.LowercaseUrls = true);
         builder.Services.AddSwaggerGen(c =>
         {
-            c.SwaggerDoc("v1",
+            c.SwaggerDoc(
+                "v1",
                 new OpenApiInfo()
                 {
                     Title = "Chat API",
-                    Description = @"
+                    Description =
+                        @"
 Welcome to the Chat Application API, a RESTful interface for building a real-time chat platform. This API allows you to manage users, create servers, channels, and send messages seamlessly. Leverage the power of real-time communication to enhance your chat experience.
 
 ### This Project is Open Source. Feel free to Contribute on <a href='https://github.com/LouisTrinczek/chat-backend'>Github</a>
@@ -47,7 +50,8 @@ Use the interactive Swagger documentation below to explore and test the availabl
 ",
                     Contact = new OpenApiContact()
                     {
-                        Name = "Louis Trinczek", Email = "trinczeklouis@gmail.com",
+                        Name = "Louis Trinczek",
+                        Email = "trinczeklouis@gmail.com",
                         Url = new Uri("https://github.com/LouisTrinczek")
                     },
                     Version = "v1"
@@ -82,10 +86,13 @@ Use the interactive Swagger documentation below to explore and test the availabl
 
         builder.Services.AddControllers();
         builder.Services.AddDbContext<ChatDataContext>(options =>
-            options.UseMySql(databaseConnectionString, ServerVersion.AutoDetect(databaseConnectionString))
-                .EnableDetailedErrors()
-                .LogTo(Console.WriteLine, LogLevel.Information)
-        );
+        {
+            options.UseMySql(
+                databaseConnectionString,
+                ServerVersion.AutoDetect(databaseConnectionString)
+            );
+            options.UseExceptionProcessor();
+        });
 
         builder.Services.AddApiVersioning(api =>
         {
@@ -98,7 +105,7 @@ Use the interactive Swagger documentation below to explore and test the availabl
                 new MediaTypeApiVersionReader("ver")
             );
         });
-        
+
         builder.Services.AddSignalR();
     }
 }

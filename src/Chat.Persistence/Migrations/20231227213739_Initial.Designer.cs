@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Chat.Persistence.Migrations
 {
     [DbContext(typeof(ChatDataContext))]
-    [Migration("20231227211553_Initial")]
+    [Migration("20231227213739_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -121,7 +121,6 @@ namespace Chat.Persistence.Migrations
                         .HasColumnType("datetime(6)");
 
                     b.Property<string>("IconUrl")
-                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("varchar(100)");
 
@@ -148,7 +147,6 @@ namespace Chat.Persistence.Migrations
                         .HasColumnType("varchar(255)");
 
                     b.Property<string>("AvatarUrl")
-                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("varchar(100)");
 

@@ -3,6 +3,7 @@ using System;
 using Chat.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Chat.Persistence.Migrations
 {
     [DbContext(typeof(ChatDataContext))]
-    partial class ChatDataContextModelSnapshot : ModelSnapshot
+    [Migration("20231227231908_UniqueEmailAndUsername")]
+    partial class UniqueEmailAndUsername
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -44,7 +47,7 @@ namespace Chat.Persistence.Migrations
 
                     b.HasIndex("ServerId");
 
-                    b.ToTable("Channel", (string)null);
+                    b.ToTable("Channel");
                 });
 
             modelBuilder.Entity("Chat.Domain.Entities.Friends", b =>
@@ -73,7 +76,7 @@ namespace Chat.Persistence.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Friends", (string)null);
+                    b.ToTable("Friends");
                 });
 
             modelBuilder.Entity("Chat.Domain.Entities.Message", b =>
@@ -103,7 +106,7 @@ namespace Chat.Persistence.Migrations
 
                     b.HasIndex("ChannelId");
 
-                    b.ToTable("Message", (string)null);
+                    b.ToTable("Message");
                 });
 
             modelBuilder.Entity("Chat.Domain.Entities.Server", b =>
@@ -135,7 +138,7 @@ namespace Chat.Persistence.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Server", (string)null);
+                    b.ToTable("Server");
                 });
 
             modelBuilder.Entity("Chat.Domain.Entities.User", b =>
@@ -182,7 +185,7 @@ namespace Chat.Persistence.Migrations
                     b.HasIndex("Email", "Username")
                         .IsUnique();
 
-                    b.ToTable("Users", (string)null);
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("Chat.Domain.Entities.Channel", b =>

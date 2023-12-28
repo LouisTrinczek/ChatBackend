@@ -1,15 +1,16 @@
 ﻿using System.Net.Mime;
-using System.Runtime.CompilerServices;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+using Chat.API.Services;
 using Chat.Common.Dtos;
 using Chat.Common.Types;
-using Chat.Domain;
 using Chat.Domain.Entities;
 using Chat.Persistence.Context;
 using Chat.Persistence.Repositories;
+using EntityFramework.Exceptions.Common;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc.Formatters;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using BC = BCrypt.Net.BCrypt;
 
 namespace Chat.API.Controllers;
 
@@ -22,14 +23,15 @@ namespace Chat.API.Controllers;
 [Produces(MediaTypeNames.Application.Json)]
 public class UsersController : ControllerBase
 {
-    private IGenericRepository<User> _genericRepository;
+    private UserRepository _userRepository;
+    private UserService _userService = new UserService();
 
     /// <summary>
     /// Dependency Injection
     /// </summary>
     public UsersController(ChatDataContext chatDataContext)
     {
-        _genericRepository = new GenericRepository<User>(chatDataContext);
+        _userRepository = new UserRepository(chatDataContext);
     }
 
     /// <summary>Creates a new User</summary>
@@ -42,9 +44,19 @@ public class UsersController : ControllerBase
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     [Consumes(typeof(UserRegistrationDto), MediaTypeNames.Application.Json)]
     [Produces(typeof(ApiResponse<string?>))]
-    public string Register([FromBody] UserRegistrationDto userRegistrationDto)
+    public IActionResult Register([FromBody] UserRegistrationDto userRegistrationDto)
     {
-        return "Not Implemented";
+        try
+        {
+            _userService.Register(userRegistrationDto);
+            return Ok();
+        }
+        catch (Exception e)
+        {
+            // TODO: Add Exception Error Message
+            Console.WriteLine(e);
+            return BadRequest();
+        }
     }
 
     /// <summary> Authenticates the User with a JWT Token </summary>
@@ -157,7 +169,7 @@ public class UsersController : ControllerBase
     {
         return "String";
     }
-    
+
     /// <summary>Gets a Paginated Chat with a user</summary>
     /// <response code='200'>Successfully get chat</response>
     /// <response code='401'>If the user isn't logged in</response>
@@ -173,7 +185,7 @@ public class UsersController : ControllerBase
     {
         return "String";
     }
-    
+
     /// <summary>Gets all Servers a User is a member of</summary>
     /// <response code='200'>Successfully get servers</response>
     /// <response code='401'>If the user isn't logged in</response>
