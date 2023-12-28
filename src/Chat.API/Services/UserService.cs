@@ -1,7 +1,9 @@
-﻿using Chat.API.Exceptions;
+﻿using System.Runtime.CompilerServices;
+using Chat.API.Exceptions;
 using Chat.Common.Dtos;
 using Chat.Common.Types;
 using Chat.Domain.Entities;
+using Chat.Domain.Mappers;
 using Chat.Persistence.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -9,45 +11,35 @@ using BC = BCrypt.Net.BCrypt;
 
 namespace Chat.API.Services;
 
-public class UserService
+public class UserService : IUserService
 {
-    // TODO: Figure out how to do DependencyInjection in Services to provide the Repositories via DependencyInjection and not via the Constructor or reinitializing a new class.
-    private UserRepository _userRepository;
+    private readonly UserRepository _userRepository;
+    private readonly UserMapper _userMapper = new UserMapper();
 
+    public UserService(UserRepository userRepository)
+    {
+        _userRepository = userRepository;
+    }
+
+    /// <summary>
+    /// Registration Logic. Generates a user with an encrypted password.
+    /// </summary>
+    /// <param name="userRegistrationDto"></param>
+    /// <returns cref="ActionResult"></returns>
+    /// <exception cref="CustomException"></exception>
     public ActionResult Register(UserRegistrationDto userRegistrationDto)
     {
         List<string> errors = new List<string>();
 
-        User user = new User();
-
-        // TODO: Remove this Validation and use the DTO Validation if the Required values are set
-        /*
-        if (userRegistrationDto.Email == string.Empty)
-        {
-            throw new CustomException("EmailIsRequired");
-        }
-
-        if (userRegistrationDto.Username == string.Empty)
-        {
-            throw new CustomException("UsernameIsRequired");
-        }
-
-        if (userRegistrationDto.Password == string.Empty)
-        {
-            throw new CustomException("PasswordIsRequired");
-        }
-        */
+        var user = _userMapper.UserRegistrationDtoToUser(userRegistrationDto);
 
         if (userRegistrationDto.Password.Length < 7)
         {
             throw new CustomException("PasswordTooShort");
         }
 
-        user.Email = userRegistrationDto.Email;
-        user.Username = userRegistrationDto.Username;
         user.Password = BC.HashPassword(userRegistrationDto.Password);
 
-        /*
         if (!user.EmailIsValid())
         {
             throw new CustomException("EmailIsNotValid");
@@ -60,13 +52,12 @@ public class UserService
         {
             throw new CustomException("UserAlreadyExists");
         }
-        */
 
         _userRepository.Insert(user);
 
         try
         {
-            // _userRepository.Save();
+            _userRepository.Save();
         }
         catch (Exception e)
         {

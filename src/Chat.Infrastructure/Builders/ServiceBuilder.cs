@@ -1,6 +1,11 @@
-﻿using Chat.Infrastructure.Interfaces.Swagger;
+﻿using Chat.Common.Types;
+using Chat.Domain;
+using Chat.Domain.Entities;
+using Chat.Infrastructure.Interfaces.Swagger;
 using Chat.Persistence.Context;
+using Chat.Persistence.Repositories;
 using EntityFramework.Exceptions.MySQL;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.EntityFrameworkCore;
@@ -107,5 +112,21 @@ Use the interactive Swagger documentation below to explore and test the availabl
         });
 
         builder.Services.AddSignalR();
+        builder.Services.PostConfigure<ApiBehaviorOptions>(apiBehaviorOptions =>
+        {
+            apiBehaviorOptions.InvalidModelStateResponseFactory = actionContext =>
+            {
+                return new BadRequestObjectResult(
+                    new ApiResponse<object>(
+                        ResponseStatus.Error,
+                        null,
+                        actionContext
+                            .ModelState.Values.SelectMany(x => x.Errors)
+                            .Select(x => x.ErrorMessage)
+                            .ToArray()
+                    )
+                );
+            };
+        });
     }
 }

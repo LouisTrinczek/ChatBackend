@@ -198,5 +198,13 @@
             <response code='401'>If the user isn't logged in</response>
             <response code='403'>If the user tries to get a chat he's not permitted to</response>
         </member>
+        <member name="M:Chat.API.Services.UserService.Register(Chat.Common.Dtos.UserRegistrationDto)">
+            <summary>
+            Registration Logic. Generates a user with an encrypted password.
+            </summary>
+            <param name="userRegistrationDto"></param>
+            <returns cref="T:Microsoft.AspNetCore.Mvc.ActionResult"></returns>
+            <exception cref="T:Chat.API.Exceptions.CustomException"></exception>
+        </member>
     </members>
 </doc>

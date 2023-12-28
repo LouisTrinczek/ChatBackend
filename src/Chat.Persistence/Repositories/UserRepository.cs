@@ -10,11 +10,11 @@ public class UserRepository : GenericRepository<User>
 
     public User? GetByUsername(string username)
     {
-        return _context.Users.Single(w => w.Username == username);
+        return _context.Users.SingleOrDefault(w => w.Username == username);
     }
 
     public User? GetByEmail(string email)
     {
-        return _context.Users.Single(w => w.Email == email);
+        return _context.Users.SingleOrDefault(w => w.Email == email);
     }
 }

@@ -1,16 +1,13 @@
 ﻿using System.Net.Mime;
+using Chat.API.Exceptions;
 using Chat.API.Services;
 using Chat.Common.Dtos;
 using Chat.Common.Types;
-using Chat.Domain.Entities;
 using Chat.Persistence.Context;
 using Chat.Persistence.Repositories;
-using EntityFramework.Exceptions.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using BC = BCrypt.Net.BCrypt;
 
 namespace Chat.API.Controllers;
 
@@ -23,15 +20,15 @@ namespace Chat.API.Controllers;
 [Produces(MediaTypeNames.Application.Json)]
 public class UsersController : ControllerBase
 {
-    private UserRepository _userRepository;
-    private UserService _userService = new UserService();
+    private readonly UserService _userService;
 
     /// <summary>
     /// Dependency Injection
     /// </summary>
     public UsersController(ChatDataContext chatDataContext)
     {
-        _userRepository = new UserRepository(chatDataContext);
+        var userRepository = new UserRepository(chatDataContext);
+        _userService = new UserService(userRepository);
     }
 
     /// <summary>Creates a new User</summary>
@@ -49,13 +46,27 @@ public class UsersController : ControllerBase
         try
         {
             _userService.Register(userRegistrationDto);
-            return Ok();
+            return Ok(new ApiResponse<object>(ResponseStatus.Error, null, new string[] { }));
         }
         catch (Exception e)
         {
-            // TODO: Add Exception Error Message
-            Console.WriteLine(e);
-            return BadRequest();
+            var responseBody = e switch
+            {
+                CustomException
+                    => new ApiResponse<object>(
+                        ResponseStatus.Error,
+                        null,
+                        new string[] { e.Message }
+                    ),
+                _
+                    => new ApiResponse<object>(
+                        ResponseStatus.Error,
+                        null,
+                        new string[] { "UnknownError" }
+                    ),
+            };
+
+            return BadRequest(responseBody);
         }
     }
 
