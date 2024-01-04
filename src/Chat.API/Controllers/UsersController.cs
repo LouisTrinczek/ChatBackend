@@ -1,10 +1,10 @@
 ﻿using System.Net.Mime;
 using Chat.API.Exceptions;
-using Chat.API.Services;
+using Chat.Application.Services;
 using Chat.Common.Dtos;
 using Chat.Common.Types;
 using Chat.Persistence.Context;
-using Chat.Persistence.Repositories;
+using Chat.Persistence.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -20,15 +20,14 @@ namespace Chat.API.Controllers;
 [Produces(MediaTypeNames.Application.Json)]
 public class UsersController : ControllerBase
 {
-    private readonly UserService _userService;
+    private readonly IUserService _userService;
 
     /// <summary>
     /// Dependency Injection
     /// </summary>
-    public UsersController(ChatDataContext chatDataContext)
+    public UsersController(IUserRepository userRepository, ChatDataContext chatDataContext, IUserService userService)
     {
-        var userRepository = new UserRepository(chatDataContext);
-        _userService = new UserService(userRepository);
+        _userService = userService;
     }
 
     /// <summary>Creates a new User</summary>
@@ -80,9 +79,35 @@ public class UsersController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [Consumes(typeof(UserLoginDto), MediaTypeNames.Application.Json)]
     [Produces(typeof(ApiResponse<string>))]
-    public string Login([FromBody] UserLoginDto userLoginDto)
+    public IActionResult Login([FromBody] UserLoginDto userLoginDto)
     {
-        return "Not Implemented";
+        try
+        {
+            var token = _userService.Login(userLoginDto);
+            return Ok(new ApiResponse<object>(ResponseStatus.Error, token, new string[] { }));
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
+            Console.WriteLine(e.StackTrace);
+            var responseBody = e switch
+            {
+                CustomException
+                    => new ApiResponse<object>(
+                        ResponseStatus.Error,
+                        null,
+                        new string[] { e.Message }
+                    ),
+                _
+                    => new ApiResponse<object>(
+                        ResponseStatus.Error,
+                        null,
+                        new string[] { "UnknownError" }
+                    ),
+            };
+
+            return BadRequest(responseBody);
+        }
     }
 
     /// <summary>Updates a User</summary>

@@ -18,5 +18,7 @@ public class AppBuilder
         app.UseHttpsRedirection();
         app.UseWebSockets();
         app.MapControllers();
+        app.UseAuthentication();
+        app.UseAuthorization();
     }
 }

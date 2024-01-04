@@ -133,7 +133,7 @@
             Provides the REST Endpoints for the User Endpoints such as Login, Registering and user editing
             </summary>
         </member>
-        <member name="M:Chat.API.Controllers.UsersController.#ctor(Chat.Persistence.Context.ChatDataContext)">
+        <member name="M:Chat.API.Controllers.UsersController.#ctor(Chat.Persistence.Interfaces.IUserRepository,Chat.Persistence.Context.ChatDataContext,Chat.Application.Services.IUserService)">
             <summary>
             Dependency Injection
             </summary>
@@ -197,14 +197,6 @@
             <response code='200'>Successfully get servers</response>
             <response code='401'>If the user isn't logged in</response>
             <response code='403'>If the user tries to get a chat he's not permitted to</response>
-        </member>
-        <member name="M:Chat.API.Services.UserService.Register(Chat.Common.Dtos.UserRegistrationDto)">
-            <summary>
-            Registration Logic. Generates a user with an encrypted password.
-            </summary>
-            <param name="userRegistrationDto"></param>
-            <returns cref="T:Microsoft.AspNetCore.Mvc.ActionResult"></returns>
-            <exception cref="T:Chat.API.Exceptions.CustomException"></exception>
         </member>
     </members>
 </doc>
