@@ -1,21 +1,26 @@
 ﻿using System.Text;
+using Chat.Application.Contracts.Repositories;
+using Chat.Application.Contracts.Security;
+using Chat.Application.Contracts.Services;
 using Chat.Application.Security;
 using Chat.Application.Services;
 using Chat.Common.Types;
+using Chat.Infrastructure.Database;
+using Chat.Infrastructure.Database.Repositories;
 using Chat.Infrastructure.Interfaces.Swagger;
-using Chat.Persistence.Context;
-using Chat.Persistence.Interfaces;
-using Chat.Persistence.Repositories;
-using EntityFramework.Exceptions.MySQL;
+using EntityFramework.Exceptions.MySQL.Pomelo;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
-namespace Chat.Infrastructure.Builders;
+namespace Chat.Server.Builders;
 
 public static class ServiceBuilder
 {
@@ -133,25 +138,28 @@ Use the interactive Swagger documentation below to explore and test the availabl
             };
         });
 
-        builder.Services.AddAuthentication(options =>
-        {
-            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-        }).AddJwtBearer(o =>
-        {
-            o.TokenValidationParameters = new TokenValidationParameters
+        builder
+            .Services.AddAuthentication(options =>
             {
-                ValidIssuer = builder.Configuration["Jwt:Issuer"],
-                ValidAudience = builder.Configuration["Jwt:Audience"],
-                IssuerSigningKey = new SymmetricSecurityKey
-                    (Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])),
-                ValidateIssuer = true,
-                ValidateAudience = true,
-                ValidateLifetime = true,
-                ValidateIssuerSigningKey = true
-            };
-        });
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(o =>
+            {
+                o.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidIssuer = builder.Configuration["Jwt:Issuer"],
+                    ValidAudience = builder.Configuration["Jwt:Audience"],
+                    IssuerSigningKey = new SymmetricSecurityKey(
+                        Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])
+                    ),
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true
+                };
+            });
         builder.Services.AddAuthorization();
         builder.Services.AddScoped<IUserService, UserService>();
         builder.Services.AddScoped<IUserRepository, UserRepository>();

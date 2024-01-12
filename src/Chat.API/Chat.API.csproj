@@ -19,10 +19,10 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\Chat.Application\Chat.Application.csproj" />
+      <ProjectReference Include="..\Chat.Application\Chat.Application.csproj" />
       <ProjectReference Include="..\Chat.Common\Chat.Common.csproj" />
       <ProjectReference Include="..\Chat.Domain\Chat.Domain.csproj" />
-      <ProjectReference Include="..\Chat.Persistence\Chat.Persistence.csproj" />
+      <ProjectReference Include="..\Chat.Infrastructure\Chat.Infrastructure.csproj" />
     </ItemGroup>
 
 </Project>

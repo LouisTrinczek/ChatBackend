@@ -1,4 +1,4 @@
-﻿namespace Chat.Domain;
+﻿namespace Chat.Application.Contracts.Repositories;
 
 public interface IGenericRepository<T>
     where T : class

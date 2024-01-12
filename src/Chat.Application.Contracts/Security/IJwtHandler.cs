@@ -1,6 +1,6 @@
 ﻿using Chat.Domain.Entities;
 
-namespace Chat.Application.Security;
+namespace Chat.Application.Contracts.Security;
 
 public interface IJwtHandler
 {

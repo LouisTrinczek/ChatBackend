@@ -2,7 +2,7 @@
 using Chat.Domain.Entities;
 using Riok.Mapperly.Abstractions;
 
-namespace Chat.Domain.Mappers;
+namespace Chat.Application.Mappers;
 
 [Mapper]
 public partial class UserMapper

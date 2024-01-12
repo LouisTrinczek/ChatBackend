@@ -1,7 +1,7 @@
 ﻿using Chat.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace Chat.Persistence.Context;
+namespace Chat.Infrastructure.Database;
 
 public class ChatDataContext : DbContext
 {

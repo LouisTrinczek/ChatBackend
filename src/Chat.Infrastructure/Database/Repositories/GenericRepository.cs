@@ -1,10 +1,8 @@
-﻿using Chat.Domain;
+﻿using Chat.Application.Contracts.Repositories;
 using Chat.Domain.Entities;
-using Chat.Persistence.Context;
-using EntityFramework.Exceptions.Common;
 using Microsoft.EntityFrameworkCore;
 
-namespace Chat.Persistence.Repositories;
+namespace Chat.Infrastructure.Database.Repositories;
 
 public class GenericRepository<T> : IGenericRepository<T>
     where T : BaseEntity

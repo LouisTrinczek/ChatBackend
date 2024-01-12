@@ -9,7 +9,7 @@
             Provides the REST Endpoints for the Server Channels like Creation, Deletion and Updating
             </summary>
         </member>
-        <member name="M:Chat.API.Controllers.ChannelsController.#ctor(Chat.Persistence.Context.ChatDataContext)">
+        <member name="M:Chat.API.Controllers.ChannelsController.#ctor(Chat.Infrastructure.Database.ChatDataContext)">
             <summary>
             Dependency Injection
             </summary>
@@ -73,7 +73,7 @@
             Provides the REST Endpoints for Friends, such as adding friends, removing friends, and getting a friendlist
             </summary>
         </member>
-        <member name="M:Chat.API.Controllers.FriendsController.#ctor(Chat.Persistence.Context.ChatDataContext)">
+        <member name="M:Chat.API.Controllers.FriendsController.#ctor(Chat.Infrastructure.Database.ChatDataContext)">
             <summary>
             Dependency Injection
             </summary>
@@ -100,7 +100,7 @@
             Provides the REST Endpoints for the Servers such as Creation, Deletion, and Updating
             </summary>
         </member>
-        <member name="M:Chat.API.Controllers.ServersController.#ctor(Chat.Persistence.Context.ChatDataContext)">
+        <member name="M:Chat.API.Controllers.ServersController.#ctor(Chat.Infrastructure.Database.ChatDataContext)">
             <summary>
             Dependency Injection
             </summary>
@@ -133,7 +133,7 @@
             Provides the REST Endpoints for the User Endpoints such as Login, Registering and user editing
             </summary>
         </member>
-        <member name="M:Chat.API.Controllers.UsersController.#ctor(Chat.Persistence.Interfaces.IUserRepository,Chat.Persistence.Context.ChatDataContext,Chat.Application.Services.IUserService)">
+        <member name="M:Chat.API.Controllers.UsersController.#ctor(Chat.Application.Contracts.Repositories.IUserRepository,Chat.Infrastructure.Database.ChatDataContext,Chat.Application.Contracts.Services.IUserService)">
             <summary>
             Dependency Injection
             </summary>
@@ -141,7 +141,7 @@
         <member name="M:Chat.API.Controllers.UsersController.Register(Chat.Common.Dtos.UserRegistrationDto)">
             <summary>Creates a new User</summary>
             <response code='200'>Successfully generated User</response>
-            <response code='400'>Invalid Email or password too Short Password</response>
+            <response code='400'>Invalid Email or password too Short</response>
             <response code='409'>User with Email or Username already exists</response>
         </member>
         <member name="M:Chat.API.Controllers.UsersController.Login(Chat.Common.Dtos.UserLoginDto)">

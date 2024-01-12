@@ -1,10 +1,10 @@
 ﻿using System.Net.Mime;
+using Chat.Application.Contracts.Repositories;
 using Chat.Common.Dtos;
 using Chat.Common.Types;
-using Chat.Domain;
 using Chat.Domain.Entities;
-using Chat.Persistence.Context;
-using Chat.Persistence.Repositories;
+using Chat.Infrastructure.Database;
+using Chat.Infrastructure.Database.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -29,7 +29,7 @@ public class ServersController
     {
         _genericRepository = new GenericRepository<Server>(chatDataContext);
     }
-    
+
     /// <summary>Creates a Server</summary>
     /// <response code='200'>Successfully Created Server</response>
     /// <response code='401'>If the user isn't logged in</response>

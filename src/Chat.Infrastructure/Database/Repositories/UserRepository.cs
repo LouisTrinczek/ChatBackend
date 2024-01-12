@@ -1,8 +1,7 @@
-﻿using Chat.Domain.Entities;
-using Chat.Persistence.Context;
-using Chat.Persistence.Interfaces;
+﻿using Chat.Application.Contracts.Repositories;
+using Chat.Domain.Entities;
 
-namespace Chat.Persistence.Repositories;
+namespace Chat.Infrastructure.Database.Repositories;
 
 public class UserRepository : GenericRepository<User>, IUserRepository
 {

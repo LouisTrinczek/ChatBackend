@@ -1,10 +1,10 @@
 ﻿using System.Net.Mime;
+using Chat.Application.Contracts.Repositories;
 using Chat.Common.Dtos;
 using Chat.Common.Types;
-using Chat.Domain;
 using Chat.Domain.Entities;
-using Chat.Persistence.Context;
-using Chat.Persistence.Repositories;
+using Chat.Infrastructure.Database;
+using Chat.Infrastructure.Database.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -29,7 +29,7 @@ public class ChannelsController
     {
         _genericRepository = new GenericRepository<Channel>(chatDataContext);
     }
-    
+
     /// <summary>Creates a Channel</summary>
     /// <response code='200'>Successfully Created Channel</response>
     /// <response code='401'>If the user isn't logged in</response>
@@ -45,7 +45,7 @@ public class ChannelsController
     {
         return "Not Implemented";
     }
-    
+
     /// <summary>Updates a Channel</summary>
     /// <response code='200'>Successfully Updated Channel</response>
     /// <response code='401'>If the user isn't logged in</response>
@@ -91,7 +91,7 @@ public class ChannelsController
     {
         return "String";
     }
-    
+
     /// <summary>Gets all Channels within the server</summary>
     /// <response code='200'>Successfully Get all channels a user sees</response>
     /// <response code='401'>If the user isn't logged in</response>
@@ -106,7 +106,7 @@ public class ChannelsController
     {
         return "String";
     }
-    
+
     /// <summary>Writes a Message to a Channel</summary>
     /// <response code='200'>Successfully sent message</response>
     /// <response code='401'>If the user isn't logged in</response>
@@ -123,7 +123,7 @@ public class ChannelsController
     {
         return "String";
     }
-    
+
     /// <summary>Updates a Message</summary>
     /// <response code='200'>Successfully updated message</response>
     /// <response code='401'>If the user isn't logged in</response>
@@ -140,7 +140,7 @@ public class ChannelsController
     {
         return "String";
     }
-    
+
     /// <summary>Deletes A Message</summary>
     /// <response code='200'>Successfully deleted message</response>
     /// <response code='401'>If the user isn't logged in</response>
@@ -156,7 +156,7 @@ public class ChannelsController
     {
         return "String";
     }
-    
+
     /// <summary>Gets a Paginated Chat from a channel</summary>
     /// <response code='200'>Successfully get chat</response>
     /// <response code='401'>If the user isn't logged in</response>

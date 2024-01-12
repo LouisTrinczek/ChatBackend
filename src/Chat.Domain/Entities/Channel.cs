@@ -1,10 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Chat.Domain.Entities;
 
 public class Channel : BaseEntity
 {
-    [Column] public string Name { get; set; } = null!;
+    [Column]
+    public string Name { get; set; } = null!;
     public ICollection<Message> Messages = null!;
 }

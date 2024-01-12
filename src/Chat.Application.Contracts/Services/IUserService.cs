@@ -1,7 +1,6 @@
 ﻿using Chat.Common.Dtos;
-using Microsoft.AspNetCore.Mvc;
 
-namespace Chat.Application.Services;
+namespace Chat.Application.Contracts.Services;
 
 public interface IUserService
 {

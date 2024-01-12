@@ -1,10 +1,10 @@
 ﻿using System.Net.Mime;
+using Chat.Application.Contracts.Repositories;
 using Chat.Common.Dtos;
 using Chat.Common.Types;
-using Chat.Domain;
 using Chat.Domain.Entities;
-using Chat.Persistence.Context;
-using Chat.Persistence.Repositories;
+using Chat.Infrastructure.Database;
+using Chat.Infrastructure.Database.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -29,7 +29,7 @@ public class FriendsController
     {
         _genericRepository = new GenericRepository<Friends>(chatDataContext);
     }
-    
+
     /// <summary>Adds a Friend</summary>
     /// <response code='200'>Successfully Added Friend</response>
     /// <response code='401'>If the user isn't logged in</response>
@@ -45,7 +45,7 @@ public class FriendsController
     {
         return "Not Implemented";
     }
-    
+
     /// <summary>Removes a Friend</summary>
     /// <response code='200'>Successfully removed a friend</response>
     /// <response code='401'>If the user isn't logged in</response>

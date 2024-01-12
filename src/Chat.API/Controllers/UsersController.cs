@@ -1,15 +1,14 @@
 ﻿using System.Data;
 using System.Net.Mime;
 using Chat.API.Exceptions;
-using Chat.Application.Services;
+using Chat.Application.Contracts.Repositories;
+using Chat.Application.Contracts.Services;
 using Chat.Common.Dtos;
 using Chat.Common.Types;
-using Chat.Persistence.Context;
-using Chat.Persistence.Interfaces;
+using Chat.Infrastructure.Database;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Routing;
 
 namespace Chat.API.Controllers;
 

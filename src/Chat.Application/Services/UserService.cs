@@ -1,10 +1,10 @@
 ﻿using System.Data;
 using Chat.API.Exceptions;
-using Chat.Application.Security;
+using Chat.Application.Contracts.Repositories;
+using Chat.Application.Contracts.Security;
+using Chat.Application.Contracts.Services;
+using Chat.Application.Mappers;
 using Chat.Common.Dtos;
-using Chat.Domain.Mappers;
-using Chat.Persistence.Interfaces;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using BC = BCrypt.Net.BCrypt;

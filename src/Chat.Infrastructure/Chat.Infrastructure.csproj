@@ -6,25 +6,18 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <InvariantGlobalization>true</InvariantGlobalization>
       <UserSecretsId>f5e28f77-2314-46b5-b7a5-dda2c86167d1</UserSecretsId>
+      <OutputType>Library</OutputType>
   </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="EntityFrameworkCore.Exceptions.MySQL" Version="8.0.0" />
-        <PackageReference Include="EntityFrameworkCore.Exceptions.MySQL.Pomelo" Version="8.0.0" />
-        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.0" />
-        <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer" Version="5.1.0" />
-        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.0" />
-        <PackageReference Include="Microsoft.AspNetCore.SignalR.Common" Version="8.0.0" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0">
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Chat.API\Chat.API.csproj" />
-      <ProjectReference Include="..\Chat.Persistence\Chat.Persistence.csproj" />
+      <ProjectReference Include="..\Chat.Application.Contracts\Chat.Application.Contracts.csproj" />
     </ItemGroup>
 
 </Project>

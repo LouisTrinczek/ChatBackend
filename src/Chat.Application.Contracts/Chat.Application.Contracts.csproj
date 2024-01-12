@@ -7,13 +7,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
-      <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.0" />
-      <PackageReference Include="Riok.Mapperly" Version="3.3.1-next.1" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <ProjectReference Include="..\Chat.Application.Contracts\Chat.Application.Contracts.csproj" />
       <ProjectReference Include="..\Chat.Common\Chat.Common.csproj" />
       <ProjectReference Include="..\Chat.Domain\Chat.Domain.csproj" />
     </ItemGroup>

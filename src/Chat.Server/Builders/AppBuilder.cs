@@ -1,6 +1,8 @@
 ﻿using Chat.API.Hubs;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Hosting;
 
-namespace Chat.Infrastructure.Builders;
+namespace Chat.Server.Builders;
 
 public class AppBuilder
 {

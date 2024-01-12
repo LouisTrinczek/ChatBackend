@@ -1,6 +1,7 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Chat.Application.Contracts.Security;
 using Chat.Domain.Entities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -11,7 +12,7 @@ public class JwtHandler : IJwtHandler
 {
     private IConfiguration _configuration;
     private JwtSecurityTokenHandler _tokenHandler = new JwtSecurityTokenHandler();
-    private readonly byte[] _key; 
+    private readonly byte[] _key;
 
     public JwtHandler(IConfiguration configuration)
     {
@@ -28,17 +29,22 @@ public class JwtHandler : IJwtHandler
     {
         var tokenDescriptor = new SecurityTokenDescriptor
         {
-            Subject = new ClaimsIdentity(new Claim[]
-            {
-                new Claim(ClaimTypes.NameIdentifier, user.Id),
-                new Claim(ClaimTypes.Name, user.Username),
-                new Claim(ClaimTypes.Email, user.Email),
-            }),
+            Subject = new ClaimsIdentity(
+                new Claim[]
+                {
+                    new Claim(ClaimTypes.NameIdentifier, user.Id),
+                    new Claim(ClaimTypes.Name, user.Username),
+                    new Claim(ClaimTypes.Email, user.Email),
+                }
+            ),
             IssuedAt = DateTime.UtcNow,
             Issuer = _configuration["JWT:Issuer"],
             Audience = _configuration["JWT:Audience"],
             Expires = DateTime.UtcNow.AddMinutes(30),
-            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(_key), SecurityAlgorithms.HmacSha512),
+            SigningCredentials = new SigningCredentials(
+                new SymmetricSecurityKey(_key),
+                SecurityAlgorithms.HmacSha512
+            ),
         };
 
         var token = _tokenHandler.CreateToken(tokenDescriptor);
@@ -67,7 +73,11 @@ public class JwtHandler : IJwtHandler
         };
         try
         {
-            _tokenHandler.ValidateToken(token, validationParameters, out SecurityToken validatedToken);
+            _tokenHandler.ValidateToken(
+                token,
+                validationParameters,
+                out SecurityToken validatedToken
+            );
             var jwtToken = (JwtSecurityToken)validatedToken;
             return jwtToken.Claims.FirstOrDefault(x => x.Type == "nameid")?.Value;
         }
