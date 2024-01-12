@@ -1,6 +1,3 @@
-using Chat.Server.Builders;
-using Microsoft.AspNetCore.Builder;
-
 namespace Chat.Server
 {
     class Program
@@ -8,13 +5,11 @@ namespace Chat.Server
         static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-
-            ServiceBuilder.Build(builder);
+            builder.AddChat();
 
             var app = builder.Build();
 
-            AppBuilder.Build(app);
-
+            app.UseChat();
             app.Run();
         }
     }
