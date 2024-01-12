@@ -20,7 +20,7 @@ public class GenericRepository<T> : IGenericRepository<T>
 
     public IEnumerable<T> GetAll()
     {
-        return _table.ToList();
+        return _table.ToList().Where(d => d.DeletedAt == null);
     }
 
     public T GetById(object id)
@@ -46,6 +46,15 @@ public class GenericRepository<T> : IGenericRepository<T>
         var existing = _table.Find(id);
 
         _table.Remove(existing!);
+    }
+
+    public void SoftDelete(object id)
+    {
+        var existing = _table.Find(id);
+
+        existing.DeletedAt = DateTime.Now;
+
+        _table.Update(existing);
     }
 
     public void Save()

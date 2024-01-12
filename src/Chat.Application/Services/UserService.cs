@@ -1,8 +1,10 @@
-﻿using Chat.API.Exceptions;
+﻿using System.Data;
+using Chat.API.Exceptions;
 using Chat.Application.Security;
 using Chat.Common.Dtos;
 using Chat.Domain.Mappers;
 using Chat.Persistence.Interfaces;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using BC = BCrypt.Net.BCrypt;
@@ -16,7 +18,11 @@ public class UserService : IUserService
     private readonly IConfiguration _configuration;
     private readonly IJwtHandler _jwtHandler;
 
-    public UserService(IUserRepository userRepository, IJwtHandler jwtHandler, IConfiguration configuration)
+    public UserService(
+        IUserRepository userRepository,
+        IJwtHandler jwtHandler,
+        IConfiguration configuration
+    )
     {
         _userRepository = userRepository;
         _configuration = configuration;
@@ -37,14 +43,14 @@ public class UserService : IUserService
 
         if (userRegistrationDto.Password.Length < 7)
         {
-            throw new CustomException("PasswordTooShort");
+            throw new InvalidDataException("PasswordTooShort");
         }
 
         user.Password = BC.HashPassword(userRegistrationDto.Password);
 
         if (!user.EmailIsValid())
         {
-            throw new CustomException("EmailIsNotValid");
+            throw new InvalidDataException("EmailIsNotValid");
         }
 
         if (
@@ -52,7 +58,7 @@ public class UserService : IUserService
             || _userRepository.GetByUsername(user.Username) != null
         )
         {
-            throw new CustomException("UserAlreadyExists");
+            throw new DuplicateNameException("UserAlreadyExists");
         }
 
         _userRepository.Insert(user);
@@ -69,32 +75,43 @@ public class UserService : IUserService
 
     public string Login(UserLoginDto userLoginDto)
     {
-        var user = _userRepository.GetByEmailOrUsername(username: userLoginDto.Username!, email: userLoginDto.Email!);
-        
-        if (string.IsNullOrWhiteSpace(userLoginDto.Username) && string.IsNullOrEmpty(userLoginDto.Email))
+        var user = _userRepository.GetByEmailOrUsername(
+            username: userLoginDto.Username!,
+            email: userLoginDto.Email!
+        );
+
+        if (
+            string.IsNullOrWhiteSpace(userLoginDto.Username)
+            && string.IsNullOrEmpty(userLoginDto.Email)
+        )
         {
-            throw new CustomException("LoginMustContainEmailOrUsername");
+            throw new InvalidDataException("LoginMustContainEmailOrUsername");
         }
 
         if (string.IsNullOrWhiteSpace(userLoginDto.Password))
         {
-            throw new CustomException("PasswordIsRequired");
+            throw new InvalidDataException("PasswordIsRequired");
         }
 
         if (user == null)
         {
-            throw new CustomException("UserDoesNotExist");
+            throw new UnauthorizedAccessException("UserDoesNotExist");
         }
 
         bool passwordIsCorrect = BC.Verify(userLoginDto.Password, user.Password);
 
         if (!passwordIsCorrect)
         {
-            throw new CustomException("PasswordIsWrong");
+            throw new UnauthorizedAccessException("EmailOrPasswordIsWrong");
         }
 
         var createdToken = _jwtHandler.GenerateToken(user);
-        
+
         return createdToken;
+    }
+
+    public void Delete(int userId)
+    {
+        _userRepository.SoftDelete(userId);
     }
 }

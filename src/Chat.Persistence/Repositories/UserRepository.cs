@@ -7,9 +7,7 @@ namespace Chat.Persistence.Repositories;
 public class UserRepository : GenericRepository<User>, IUserRepository
 {
     public UserRepository(ChatDataContext chatDataContext)
-        : base(chatDataContext)
-    {
-    }
+        : base(chatDataContext) { }
 
     public User? GetByUsername(string username)
     {

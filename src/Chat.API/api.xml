@@ -156,7 +156,7 @@
             <response code='401'>If the user isn't logged in</response>
             <response code='403'>If the user tries to update a user he's not permitted to</response>
         </member>
-        <member name="M:Chat.API.Controllers.UsersController.Delete">
+        <member name="M:Chat.API.Controllers.UsersController.Delete(System.Int32)">
             <summary>Deletes a User</summary>
             <response code='200'>Successfully Deleted User</response>
             <response code='401'>If the user isn't logged in</response>

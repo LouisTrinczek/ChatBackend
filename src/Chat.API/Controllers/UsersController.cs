@@ -1,4 +1,5 @@
-﻿using System.Net.Mime;
+﻿using System.Data;
+using System.Net.Mime;
 using Chat.API.Exceptions;
 using Chat.Application.Services;
 using Chat.Common.Dtos;
@@ -8,6 +9,7 @@ using Chat.Persistence.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Routing;
 
 namespace Chat.API.Controllers;
 
@@ -25,21 +27,25 @@ public class UsersController : ControllerBase
     /// <summary>
     /// Dependency Injection
     /// </summary>
-    public UsersController(IUserRepository userRepository, ChatDataContext chatDataContext, IUserService userService)
+    public UsersController(
+        IUserRepository userRepository,
+        ChatDataContext chatDataContext,
+        IUserService userService
+    )
     {
         _userService = userService;
     }
 
     /// <summary>Creates a new User</summary>
     /// <response code='200'>Successfully generated User</response>
-    /// <response code='400'>Invalid Email or password too Short Password</response>
+    /// <response code='400'>Invalid Email or password too Short</response>
     /// <response code='409'>User with Email or Username already exists</response>
     [HttpPost("register")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     [Consumes(typeof(UserRegistrationDto), MediaTypeNames.Application.Json)]
-    [Produces(typeof(ApiResponse<string?>))]
+    [Produces(typeof(ApiResponse<object>))]
     public IActionResult Register([FromBody] UserRegistrationDto userRegistrationDto)
     {
         try
@@ -49,23 +55,35 @@ public class UsersController : ControllerBase
         }
         catch (Exception e)
         {
-            var responseBody = e switch
+            ObjectResult exception = e switch
             {
-                CustomException
-                    => new ApiResponse<object>(
-                        ResponseStatus.Error,
-                        null,
-                        new string[] { e.Message }
+                DuplicateNameException
+                    => Conflict(
+                        new ApiResponse<object>(
+                            ResponseStatus.Error,
+                            null,
+                            new string[] { e.Message }
+                        )
+                    ),
+                InvalidDataException
+                    => BadRequest(
+                        new ApiResponse<object>(
+                            ResponseStatus.Error,
+                            null,
+                            new string[] { e.Message }
+                        )
                     ),
                 _
-                    => new ApiResponse<object>(
-                        ResponseStatus.Error,
-                        null,
-                        new string[] { "UnknownError" }
+                    => BadRequest(
+                        new ApiResponse<object>(
+                            ResponseStatus.Error,
+                            null,
+                            new string[] { "UnknownError" }
+                        )
                     ),
             };
 
-            return BadRequest(responseBody);
+            return exception;
         }
     }
 
@@ -88,25 +106,35 @@ public class UsersController : ControllerBase
         }
         catch (Exception e)
         {
-            Console.WriteLine(e.Message);
-            Console.WriteLine(e.StackTrace);
-            var responseBody = e switch
+            ObjectResult exception = e switch
             {
-                CustomException
-                    => new ApiResponse<object>(
-                        ResponseStatus.Error,
-                        null,
-                        new string[] { e.Message }
+                InvalidDataException
+                    => BadRequest(
+                        new ApiResponse<object>(
+                            ResponseStatus.Error,
+                            null,
+                            new string[] { e.Message }
+                        )
+                    ),
+                UnauthorizedAccessException
+                    => Unauthorized(
+                        new ApiResponse<object>(
+                            ResponseStatus.Error,
+                            null,
+                            new string[] { e.Message }
+                        )
                     ),
                 _
-                    => new ApiResponse<object>(
-                        ResponseStatus.Error,
-                        null,
-                        new string[] { "UnknownError" }
+                    => BadRequest(
+                        new ApiResponse<object>(
+                            ResponseStatus.Error,
+                            null,
+                            new string[] { "UnknownError" }
+                        )
                     ),
             };
 
-            return BadRequest(responseBody);
+            return exception;
         }
     }
 
@@ -136,9 +164,35 @@ public class UsersController : ControllerBase
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [Produces(typeof(ApiResponse<string>))]
     [Authorize]
-    public string Delete()
+    public IActionResult Delete(int userId)
     {
-        return "Not Implemented";
+        Console.WriteLine("TriggereD");
+        Console.WriteLine(RouteData.Values["userId"]);
+        try
+        {
+            // _userService.Delete(userId);
+            return Ok(new ApiResponse<object>(ResponseStatus.Error, null, new string[] { }));
+        }
+        catch (Exception e)
+        {
+            var responseBody = e switch
+            {
+                CustomException
+                    => new ApiResponse<object>(
+                        ResponseStatus.Error,
+                        null,
+                        new string[] { e.Message }
+                    ),
+                _
+                    => new ApiResponse<object>(
+                        ResponseStatus.Error,
+                        null,
+                        new string[] { "UnknownError" }
+                    ),
+            };
+
+            return BadRequest(responseBody);
+        }
     }
 
     /// <summary>Gets a User</summary>
