@@ -1,10 +1,12 @@
 ﻿using System.Data;
-using Chat.API.Exceptions;
+using System.Security.Claims;
 using Chat.Application.Contracts.Repositories;
 using Chat.Application.Contracts.Security;
 using Chat.Application.Contracts.Services;
+using Chat.Application.Exceptions;
 using Chat.Application.Mappers;
 using Chat.Common.Dtos;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using BC = BCrypt.Net.BCrypt;
@@ -17,16 +19,19 @@ public class UserService : IUserService
     private readonly UserMapper _userMapper = new UserMapper();
     private readonly IConfiguration _configuration;
     private readonly IJwtHandler _jwtHandler;
+    private readonly HttpContext _httpContext;
 
     public UserService(
         IUserRepository userRepository,
         IJwtHandler jwtHandler,
-        IConfiguration configuration
+        IConfiguration configuration,
+        IHttpContextAccessor httpContextAccessor
     )
     {
         _userRepository = userRepository;
         _configuration = configuration;
         _jwtHandler = jwtHandler;
+        _httpContext = httpContextAccessor.HttpContext!;
     }
 
     /// <summary>
@@ -76,8 +81,8 @@ public class UserService : IUserService
     public string Login(UserLoginDto userLoginDto)
     {
         var user = _userRepository.GetByEmailOrUsername(
-            username: userLoginDto.Username!,
-            email: userLoginDto.Email!
+            username: userLoginDto.Username ?? "",
+            email: userLoginDto.Email ?? ""
         );
 
         if (
@@ -95,14 +100,14 @@ public class UserService : IUserService
 
         if (user == null)
         {
-            throw new UnauthorizedAccessException("UserDoesNotExist");
+            throw new BadRequestException("UserDoesNotExist");
         }
 
         bool passwordIsCorrect = BC.Verify(userLoginDto.Password, user.Password);
 
         if (!passwordIsCorrect)
         {
-            throw new UnauthorizedAccessException("EmailOrPasswordIsWrong");
+            throw new BadRequestException("EmailOrPasswordIsWrong");
         }
 
         var createdToken = _jwtHandler.GenerateToken(user);
@@ -110,18 +115,42 @@ public class UserService : IUserService
         return createdToken;
     }
 
+    public void Update(UserUpdateDto userUpdateDto, string userId)
+    {
+        var userToUpdate = _userRepository.GetById(userId);
+        var mappedUser = _userMapper.UserUpdateDtoToUser(userUpdateDto);
+        var authenticatedUserId = _jwtHandler.GetAuthenticatedClaimValue(ClaimTypes.NameIdentifier);
+
+        if (authenticatedUserId != userToUpdate.Id)
+        {
+            throw new ForbiddenException($"NotPermittedToDeleteUser");
+        }
+
+        // TODO: Check that Email and Username isn't taken before changing.
+
+        userToUpdate.Email = mappedUser.Email;
+        userToUpdate.Username = mappedUser.Username;
+        userToUpdate.Password = mappedUser.Password;
+
+        _userRepository.Save();
+    }
+
     public void Delete(string userId)
     {
-        try
+        var userToDelete = _userRepository.GetById(userId);
+        var authenticatedUserId = _jwtHandler.GetAuthenticatedClaimValue(ClaimTypes.NameIdentifier);
+
+        if (authenticatedUserId != userToDelete.Id)
         {
-            _userRepository.SoftDelete(userId);
-            _userRepository.Save();
+            throw new ForbiddenException($"NotPermittedToDeleteUser");
         }
-        catch (Exception e)
+
+        if (userToDelete is null || userToDelete.DeletedAt != null)
         {
-            // TODO: Improve Error Handling
-            Console.WriteLine(e);
-            throw;
+            throw new BadRequestException($"UserDoesNotExist");
         }
+
+        _userRepository.SoftDelete(userId);
+        _userRepository.Save();
     }
 }

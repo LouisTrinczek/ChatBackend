@@ -3,6 +3,7 @@ using System.Security.Claims;
 using System.Text;
 using Chat.Application.Contracts.Security;
 using Chat.Domain.Entities;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 
@@ -12,11 +13,13 @@ public class JwtHandler : IJwtHandler
 {
     private IConfiguration _configuration;
     private JwtSecurityTokenHandler _tokenHandler = new JwtSecurityTokenHandler();
+    private readonly HttpContext _httpContext;
     private readonly byte[] _key;
 
-    public JwtHandler(IConfiguration configuration)
+    public JwtHandler(IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
     {
         _configuration = configuration;
+        _httpContext = httpContextAccessor.HttpContext!;
         _key = Encoding.ASCII.GetBytes(_configuration["JWT:Key"]);
     }
 
@@ -40,7 +43,7 @@ public class JwtHandler : IJwtHandler
             IssuedAt = DateTime.UtcNow,
             Issuer = _configuration["JWT:Issuer"],
             Audience = _configuration["JWT:Audience"],
-            Expires = DateTime.UtcNow.AddMinutes(30),
+            Expires = DateTime.UtcNow.AddMinutes(9999930),
             SigningCredentials = new SigningCredentials(
                 new SymmetricSecurityKey(_key),
                 SecurityAlgorithms.HmacSha512
@@ -86,5 +89,13 @@ public class JwtHandler : IJwtHandler
             Console.WriteLine(e);
             throw;
         }
+    }
+
+    public string? GetAuthenticatedClaimValue(string claimType)
+    {
+        var claimValue = _httpContext
+            .User.Claims.FirstOrDefault(claim => claim.Type == claimType)!
+            .Value;
+        return claimValue;
     }
 }

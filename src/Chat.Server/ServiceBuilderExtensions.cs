@@ -72,6 +72,7 @@ public static class ServiceBuilderExtensions
         self.Services.AddScoped<IUserService, UserService>();
         self.Services.AddScoped<IUserRepository, UserRepository>();
         self.Services.AddScoped<IJwtHandler, JwtHandler>();
+        self.Services.AddHttpContextAccessor();
         return self;
     }
 
@@ -104,7 +105,7 @@ public static class ServiceBuilderExtensions
                     ValidIssuer = self.Configuration["Jwt:Issuer"],
                     ValidAudience = self.Configuration["Jwt:Audience"],
                     IssuerSigningKey = new SymmetricSecurityKey(
-                        Encoding.UTF8.GetBytes(self.Configuration["Jwt:Key"])
+                        Encoding.UTF8.GetBytes(self.Configuration["Jwt:Key"] ?? "")
                     ),
                     ValidateIssuer = true,
                     ValidateAudience = true,

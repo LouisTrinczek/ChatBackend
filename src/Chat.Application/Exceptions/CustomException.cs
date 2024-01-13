@@ -1,4 +1,4 @@
-﻿namespace Chat.API.Exceptions;
+﻿namespace Chat.Application.Exceptions;
 
 public class CustomException : Exception
 {

@@ -1,6 +1,8 @@
 ﻿using Chat.Application.Contracts.Repositories;
+using Chat.Application.Exceptions;
 using Chat.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Chat.Infrastructure.Database.Repositories;
 
