@@ -8,6 +8,6 @@ public interface IGenericRepository<T>
     void Insert(T obj);
     void Update(T obj);
     void Delete(object id);
-    void SoftDelete(object id);
+    void SoftDelete(string id);
     void Save();
 }

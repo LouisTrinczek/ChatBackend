@@ -110,8 +110,18 @@ public class UserService : IUserService
         return createdToken;
     }
 
-    public void Delete(int userId)
+    public void Delete(string userId)
     {
-        _userRepository.SoftDelete(userId);
+        try
+        {
+            _userRepository.SoftDelete(userId);
+            _userRepository.Save();
+        }
+        catch (Exception e)
+        {
+            // TODO: Improve Error Handling
+            Console.WriteLine(e);
+            throw;
+        }
     }
 }

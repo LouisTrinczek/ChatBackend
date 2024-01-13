@@ -163,13 +163,11 @@ public class UsersController : ControllerBase
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [Produces(typeof(ApiResponse<string>))]
     [Authorize]
-    public IActionResult Delete(int userId)
+    public IActionResult Delete([FromRoute] string userId)
     {
-        Console.WriteLine("TriggereD");
-        Console.WriteLine(RouteData.Values["userId"]);
         try
         {
-            // _userService.Delete(userId);
+            _userService.Delete(userId);
             return Ok(new ApiResponse<object>(ResponseStatus.Error, null, new string[] { }));
         }
         catch (Exception e)

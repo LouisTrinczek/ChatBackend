@@ -15,6 +15,7 @@ public static class AppBuilderExtension
 
         self.MapHub<ChatHub>("/chat");
 
+        self.UseRouting();
         self.UseHttpsRedirection();
         self.UseWebSockets();
         self.MapControllers();

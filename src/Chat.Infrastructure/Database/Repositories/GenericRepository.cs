@@ -46,13 +46,11 @@ public class GenericRepository<T> : IGenericRepository<T>
         _table.Remove(existing!);
     }
 
-    public void SoftDelete(object id)
+    public void SoftDelete(string id)
     {
-        var existing = _table.Find(id);
+        var existing = _context.Set<T>().Where(it => it.Id == id).ToList();
 
-        existing.DeletedAt = DateTime.Now;
-
-        _table.Update(existing);
+        existing[0].DeletedAt = DateTime.Now;
     }
 
     public void Save()
