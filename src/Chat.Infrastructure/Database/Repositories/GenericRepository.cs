@@ -50,7 +50,7 @@ public class GenericRepository<T> : IGenericRepository<T>
 
     public void SoftDelete(string id)
     {
-        var existing = _context.Set<T>().Where(it => it.Id == id).ToList();
+        var existing = _table.Where(it => it.Id == id).ToList();
 
         existing[0].DeletedAt = DateTime.Now;
     }

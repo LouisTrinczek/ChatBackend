@@ -4,8 +4,8 @@ using Chat.Domain.Entities;
 
 namespace Chat.Infrastructure.Database.Repositories;
 
-public class ServerRepository : GenericRepository<Server>, IServerRepository
+public class ChannelRepository : GenericRepository<Channel>, IChannelRepository
 {
-    public ServerRepository(ChatDataContext chatDataContext)
+    public ChannelRepository(ChatDataContext chatDataContext)
         : base(chatDataContext) { }
 }

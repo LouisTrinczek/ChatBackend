@@ -6,5 +6,8 @@ public class Channel : BaseEntity
 {
     [Column]
     public string Name { get; set; } = null!;
-    public ICollection<Message> Messages = null!;
+
+    public string ServerId { get; set; }
+    public Server Server { get; set; } = null!;
+    public ICollection<Message> Messages = new List<Message>();
 }

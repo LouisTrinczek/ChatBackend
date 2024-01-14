@@ -12,8 +12,8 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.0" />
-      <PackageReference Include="Riok.Mapperly" Version="3.3.1-next.1" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.1" />
+      <PackageReference Include="Riok.Mapperly" Version="3.4.0-next.2" />
     </ItemGroup>
 
 </Project>

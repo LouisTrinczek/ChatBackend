@@ -1,11 +1,9 @@
 ﻿using System.Data;
 using System.Net.Mime;
-using Chat.Application.Contracts.Repositories;
 using Chat.Application.Contracts.Services;
 using Chat.Application.Exceptions;
 using Chat.Common.Dtos;
 using Chat.Common.Types;
-using Chat.Infrastructure.Database;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;

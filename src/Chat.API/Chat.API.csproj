@@ -10,11 +10,12 @@
 
     <ItemGroup>
       <PackageReference Include="EntityFrameworkCore.Exceptions.MySQL.Pomelo" Version="8.0.0" />
-      <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.0" />
+      <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.1" />
       <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer" Version="5.1.0" />
-      <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.0" />
-      <PackageReference Include="Microsoft.AspNetCore.SignalR.Common" Version="8.0.0" />
-      <PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" Version="7.0.3" />
+      <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.1" />
+      <PackageReference Include="Microsoft.AspNetCore.SignalR.Common" Version="8.0.1" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.1" />
+      <PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" Version="7.2.0" />
       <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="6.5.0" />
     </ItemGroup>
 

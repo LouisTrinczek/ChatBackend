@@ -1,11 +1,8 @@
 ﻿using System.Net.Mime;
-using Chat.Application.Contracts.Repositories;
 using Chat.Application.Contracts.Services;
+using Chat.Application.Exceptions;
 using Chat.Common.Dtos;
 using Chat.Common.Types;
-using Chat.Domain.Entities;
-using Chat.Infrastructure.Database;
-using Chat.Infrastructure.Database.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -20,7 +17,7 @@ namespace Chat.API.Controllers;
 [ApiVersion("1")]
 [Route("/api/v{version:apiVersion}/[controller]")]
 [Produces(MediaTypeNames.Application.Json)]
-public class ServersController
+public class ServersController : ControllerBase
 {
     private readonly ILogger<ServersController> _logger;
     private readonly IServerService _serverService;
@@ -43,9 +40,44 @@ public class ServersController
     [Produces(typeof(ApiResponse<ServerResponseDto>))]
     [Consumes(typeof(ServerResponseDto), MediaTypeNames.Application.Json)]
     [Authorize]
-    public string Create([FromBody] ServerCreationDto serverCreationDto)
+    public IActionResult Create([FromBody] ServerCreationDto serverCreationDto)
     {
-        return "Not Implemented";
+        try
+        {
+            var serverResponseDto = _serverService.Create(serverCreationDto);
+            return Ok(
+                new ApiResponse<ServerResponseDto>(
+                    ResponseStatus.Error,
+                    serverResponseDto,
+                    new string[] { }
+                )
+            );
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e.ToString());
+            ObjectResult exception = e switch
+            {
+                BadRequestException
+                    => BadRequest(
+                        new ApiResponse<object>(
+                            ResponseStatus.Error,
+                            null,
+                            new string[] { e.Message }
+                        )
+                    ),
+                _
+                    => BadRequest(
+                        new ApiResponse<object>(
+                            ResponseStatus.Error,
+                            null,
+                            new string[] { "UnknownError" }
+                        )
+                    ),
+            };
+
+            return exception;
+        }
     }
 
     /// <summary>Updates a Server</summary>

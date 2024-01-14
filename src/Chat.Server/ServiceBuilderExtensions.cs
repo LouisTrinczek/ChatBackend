@@ -23,8 +23,8 @@ public static class ServiceBuilderExtensions
 {
     public static WebApplicationBuilder AddChat(this WebApplicationBuilder self)
     {
-        return self.AddLogging()
-            .AddDatabase()
+        return self.AddDatabase()
+            .AddLogging()
             .AddDependencyInjection()
             .AddAuthentication()
             .AddSwagger()
@@ -83,6 +83,8 @@ public static class ServiceBuilderExtensions
         self.Services.AddScoped<IUserRepository, UserRepository>();
         self.Services.AddScoped<IServerService, ServerService>();
         self.Services.AddScoped<IServerRepository, ServerRepository>();
+        self.Services.AddScoped<IChannelService, ChannelService>();
+        self.Services.AddScoped<IChannelRepository, ChannelRepository>();
         self.Services.AddScoped<IJwtHandler, JwtHandler>();
         self.Services.AddHttpContextAccessor();
         return self;

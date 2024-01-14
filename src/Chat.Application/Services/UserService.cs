@@ -6,10 +6,10 @@ using Chat.Application.Contracts.Services;
 using Chat.Application.Exceptions;
 using Chat.Application.Mappers;
 using Chat.Common.Dtos;
+using Chat.Domain.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using BC = BCrypt.Net.BCrypt;
 
 namespace Chat.Application.Services;
@@ -166,6 +166,11 @@ public class UserService : IUserService
 
         _userRepository.SoftDelete(userId);
         _userRepository.Save();
+    }
+
+    public User? GetUserById(string userId)
+    {
+        return _userRepository.GetById(userId);
     }
 
     public string? GetAuthenticatedUserId()
