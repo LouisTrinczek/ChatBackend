@@ -23,15 +23,21 @@ public static class ServiceBuilderExtensions
 {
     public static WebApplicationBuilder AddChat(this WebApplicationBuilder self)
     {
-        self.Services.AddLogging(log =>
-        {
-            log.AddConsole();
-        });
-        return self.AddDatabase()
+        return self.AddLogging()
+            .AddDatabase()
             .AddDependencyInjection()
             .AddAuthentication()
             .AddSwagger()
             .AddApi();
+    }
+
+    public static WebApplicationBuilder AddLogging(this WebApplicationBuilder self)
+    {
+        self.Services.AddLogging(log =>
+        {
+            log.AddConsole();
+        });
+        return self;
     }
 
     public static WebApplicationBuilder AddApi(this WebApplicationBuilder self)
@@ -75,6 +81,8 @@ public static class ServiceBuilderExtensions
     {
         self.Services.AddScoped<IUserService, UserService>();
         self.Services.AddScoped<IUserRepository, UserRepository>();
+        self.Services.AddScoped<IServerService, ServerService>();
+        self.Services.AddScoped<IServerRepository, ServerRepository>();
         self.Services.AddScoped<IJwtHandler, JwtHandler>();
         self.Services.AddHttpContextAccessor();
         return self;

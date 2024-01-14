@@ -1,5 +1,6 @@
 ﻿using System.Net.Mime;
 using Chat.Application.Contracts.Repositories;
+using Chat.Application.Contracts.Services;
 using Chat.Common.Dtos;
 using Chat.Common.Types;
 using Chat.Domain.Entities;
@@ -8,6 +9,7 @@ using Chat.Infrastructure.Database.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 namespace Chat.API.Controllers;
 
@@ -20,14 +22,16 @@ namespace Chat.API.Controllers;
 [Produces(MediaTypeNames.Application.Json)]
 public class ServersController
 {
-    private IGenericRepository<Server> _genericRepository;
+    private readonly ILogger<ServersController> _logger;
+    private readonly IServerService _serverService;
 
     /// <summary>
     /// Dependency Injection
     /// </summary>
-    public ServersController(ChatDataContext chatDataContext)
+    public ServersController(ILogger<ServersController> logger, IServerService serverService)
     {
-        _genericRepository = new GenericRepository<Server>(chatDataContext);
+        _logger = logger;
+        _serverService = serverService;
     }
 
     /// <summary>Creates a Server</summary>

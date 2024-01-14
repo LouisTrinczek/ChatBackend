@@ -100,7 +100,7 @@
             Provides the REST Endpoints for the Servers such as Creation, Deletion, and Updating
             </summary>
         </member>
-        <member name="M:Chat.API.Controllers.ServersController.#ctor(Chat.Infrastructure.Database.ChatDataContext)">
+        <member name="M:Chat.API.Controllers.ServersController.#ctor(Microsoft.Extensions.Logging.ILogger{Chat.API.Controllers.ServersController},Chat.Application.Contracts.Services.IServerService)">
             <summary>
             Dependency Injection
             </summary>
@@ -133,7 +133,7 @@
             Provides the REST Endpoints for the User Endpoints such as Login, Registering and user editing
             </summary>
         </member>
-        <member name="M:Chat.API.Controllers.UsersController.#ctor(Chat.Application.Contracts.Repositories.IUserRepository,Chat.Infrastructure.Database.ChatDataContext,Chat.Application.Contracts.Services.IUserService,Microsoft.Extensions.Logging.ILogger{Chat.API.Controllers.UsersController})">
+        <member name="M:Chat.API.Controllers.UsersController.#ctor(Chat.Application.Contracts.Services.IUserService,Microsoft.Extensions.Logging.ILogger{Chat.API.Controllers.UsersController})">
             <summary>
             Dependency Injection
             </summary>

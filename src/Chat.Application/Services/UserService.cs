@@ -18,9 +18,7 @@ public class UserService : IUserService
 {
     private readonly IUserRepository _userRepository;
     private readonly UserMapper _userMapper = new UserMapper();
-    private readonly IConfiguration _configuration;
     private readonly IJwtHandler _jwtHandler;
-    private readonly HttpContext _httpContext;
 
     public UserService(
         IUserRepository userRepository,
@@ -30,9 +28,7 @@ public class UserService : IUserService
     )
     {
         _userRepository = userRepository;
-        _configuration = configuration;
         _jwtHandler = jwtHandler;
-        _httpContext = httpContextAccessor.HttpContext!;
     }
 
     /// <summary>
@@ -41,7 +37,7 @@ public class UserService : IUserService
     /// <param name="userRegistrationDto"></param>
     /// <returns cref="ActionResult"></returns>
     /// <exception cref="CustomException"></exception>
-    public void Register(UserRegistrationDto userRegistrationDto)
+    public UserResponseDto Register(UserRegistrationDto userRegistrationDto)
     {
         var user = _userMapper.UserRegistrationDtoToUser(userRegistrationDto);
 
@@ -67,14 +63,9 @@ public class UserService : IUserService
 
         _userRepository.Insert(user);
 
-        try
-        {
-            _userRepository.Save();
-        }
-        catch (Exception e)
-        {
-            throw new CustomException("ErrorWhileCreatingUser");
-        }
+        _userRepository.Save();
+
+        return _userMapper.UserToUserResponseDto(user);
     }
 
     public string Login(UserLoginDto userLoginDto)
@@ -175,5 +166,10 @@ public class UserService : IUserService
 
         _userRepository.SoftDelete(userId);
         _userRepository.Save();
+    }
+
+    public string? GetAuthenticatedUserId()
+    {
+        return _jwtHandler.GetAuthenticatedClaimValue(ClaimTypes.NameIdentifier);
     }
 }

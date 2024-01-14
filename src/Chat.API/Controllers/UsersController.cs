@@ -3,7 +3,6 @@ using System.Net.Mime;
 using Chat.Application.Contracts.Repositories;
 using Chat.Application.Contracts.Services;
 using Chat.Application.Exceptions;
-using Chat.Application.Services;
 using Chat.Common.Dtos;
 using Chat.Common.Types;
 using Chat.Infrastructure.Database;
@@ -29,12 +28,7 @@ public class UsersController : ControllerBase
     /// <summary>
     /// Dependency Injection
     /// </summary>
-    public UsersController(
-        IUserRepository userRepository,
-        ChatDataContext chatDataContext,
-        IUserService userService,
-        ILogger<UsersController> logger
-    )
+    public UsersController(IUserService userService, ILogger<UsersController> logger)
     {
         _userService = userService;
         _logger = logger;
@@ -49,13 +43,19 @@ public class UsersController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     [Consumes(typeof(UserRegistrationDto), MediaTypeNames.Application.Json)]
-    [Produces(typeof(ApiResponse<object>))]
+    [Produces(typeof(ApiResponse<UserResponseDto>))]
     public IActionResult Register([FromBody] UserRegistrationDto userRegistrationDto)
     {
         try
         {
-            _userService.Register(userRegistrationDto);
-            return Ok(new ApiResponse<object>(ResponseStatus.Error, null, new string[] { }));
+            var userResponseDto = _userService.Register(userRegistrationDto);
+            return Ok(
+                new ApiResponse<UserResponseDto>(
+                    ResponseStatus.Error,
+                    userResponseDto,
+                    new string[] { }
+                )
+            );
         }
         catch (Exception e)
         {
@@ -105,7 +105,7 @@ public class UsersController : ControllerBase
         try
         {
             var token = _userService.Login(userLoginDto);
-            return Ok(new ApiResponse<object>(ResponseStatus.Error, token, new string[] { }));
+            return Ok(new ApiResponse<string>(ResponseStatus.Error, token, new string[] { }));
         }
         catch (Exception e)
         {
@@ -154,7 +154,11 @@ public class UsersController : ControllerBase
         {
             var userResponseDto = _userService.Update(userUpdateDto, userId);
             return Ok(
-                new ApiResponse<object>(ResponseStatus.Error, userResponseDto, new string[] { })
+                new ApiResponse<UserResponseDto>(
+                    ResponseStatus.Error,
+                    userResponseDto,
+                    new string[] { }
+                )
             );
         }
         catch (Exception e)
