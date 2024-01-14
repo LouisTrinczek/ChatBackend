@@ -3,12 +3,14 @@ using System.Net.Mime;
 using Chat.Application.Contracts.Repositories;
 using Chat.Application.Contracts.Services;
 using Chat.Application.Exceptions;
+using Chat.Application.Services;
 using Chat.Common.Dtos;
 using Chat.Common.Types;
 using Chat.Infrastructure.Database;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 namespace Chat.API.Controllers;
 
@@ -22,6 +24,7 @@ namespace Chat.API.Controllers;
 public class UsersController : ControllerBase
 {
     private readonly IUserService _userService;
+    private readonly ILogger<UsersController> _logger;
 
     /// <summary>
     /// Dependency Injection
@@ -29,10 +32,12 @@ public class UsersController : ControllerBase
     public UsersController(
         IUserRepository userRepository,
         ChatDataContext chatDataContext,
-        IUserService userService
+        IUserService userService,
+        ILogger<UsersController> logger
     )
     {
         _userService = userService;
+        _logger = logger;
     }
 
     /// <summary>Creates a new User</summary>
@@ -54,6 +59,7 @@ public class UsersController : ControllerBase
         }
         catch (Exception e)
         {
+            _logger.LogError(e.ToString());
             ObjectResult exception = e switch
             {
                 DuplicateNameException
@@ -103,6 +109,7 @@ public class UsersController : ControllerBase
         }
         catch (Exception e)
         {
+            _logger.LogError(e.ToString());
             ObjectResult exception = e switch
             {
                 BadRequestException
@@ -132,10 +139,12 @@ public class UsersController : ControllerBase
     /// <response code='200'>Successfully Updated User</response>
     /// <response code='401'>If the user isn't logged in</response>
     /// <response code='403'>If the user tries to update a user he's not permitted to</response>
+    /// <response code='409'>If the user tries to update to a username or email that is already taken</response>
     [HttpPut("{userId}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
     [Consumes(typeof(UserUpdateDto), MediaTypeNames.Application.Json)]
     [Produces(typeof(ApiResponse<UserResponseDto>))]
     [Authorize]
@@ -143,11 +152,14 @@ public class UsersController : ControllerBase
     {
         try
         {
-            _userService.Update(userUpdateDto, userId);
-            return Ok(new ApiResponse<object>(ResponseStatus.Error, null, new string[] { }));
+            var userResponseDto = _userService.Update(userUpdateDto, userId);
+            return Ok(
+                new ApiResponse<object>(ResponseStatus.Error, userResponseDto, new string[] { })
+            );
         }
         catch (Exception e)
         {
+            _logger.LogError(e.ToString());
             ObjectResult exception = e switch
             {
                 InvalidDataException
@@ -160,6 +172,30 @@ public class UsersController : ControllerBase
                     ),
                 UnauthorizedAccessException
                     => Unauthorized(
+                        new ApiResponse<object>(
+                            ResponseStatus.Error,
+                            null,
+                            new string[] { e.Message }
+                        )
+                    ),
+                ConflictException
+                    => Conflict(
+                        new ApiResponse<object>(
+                            ResponseStatus.Error,
+                            null,
+                            new string[] { e.Message }
+                        )
+                    ),
+                BadRequestException
+                    => BadRequest(
+                        new ApiResponse<object>(
+                            ResponseStatus.Error,
+                            null,
+                            new string[] { e.Message }
+                        )
+                    ),
+                ForbiddenException
+                    => new Forbidden(
                         new ApiResponse<object>(
                             ResponseStatus.Error,
                             null,
@@ -201,6 +237,7 @@ public class UsersController : ControllerBase
         }
         catch (Exception e)
         {
+            _logger.LogError(e.ToString());
             ObjectResult exception = e switch
             {
                 CustomException

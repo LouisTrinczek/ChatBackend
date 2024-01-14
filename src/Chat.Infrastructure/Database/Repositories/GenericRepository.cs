@@ -23,9 +23,9 @@ public class GenericRepository<T> : IGenericRepository<T>
         return _table.ToList().Where(d => d.DeletedAt == null);
     }
 
-    public T GetById(object id)
+    public T? GetById(string id)
     {
-        return _table.Find(id)!;
+        return _table.FirstOrDefault(t => t.Id == id);
     }
 
     public void Insert(T obj)

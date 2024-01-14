@@ -9,6 +9,7 @@ using Chat.Common.Dtos;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using BC = BCrypt.Net.BCrypt;
 
 namespace Chat.Application.Services;
@@ -42,8 +43,6 @@ public class UserService : IUserService
     /// <exception cref="CustomException"></exception>
     public void Register(UserRegistrationDto userRegistrationDto)
     {
-        List<string> errors = new List<string>();
-
         var user = _userMapper.UserRegistrationDtoToUser(userRegistrationDto);
 
         if (userRegistrationDto.Password.Length < 7)
@@ -115,30 +114,54 @@ public class UserService : IUserService
         return createdToken;
     }
 
-    public void Update(UserUpdateDto userUpdateDto, string userId)
+    public UserResponseDto Update(UserUpdateDto userUpdateDto, string userId)
     {
         var userToUpdate = _userRepository.GetById(userId);
         var mappedUser = _userMapper.UserUpdateDtoToUser(userUpdateDto);
         var authenticatedUserId = _jwtHandler.GetAuthenticatedClaimValue(ClaimTypes.NameIdentifier);
+
+        if (userToUpdate == null || userToUpdate.DeletedAt is not null)
+        {
+            throw new BadRequestException("UserDoesNotExist");
+        }
 
         if (authenticatedUserId != userToUpdate.Id)
         {
             throw new ForbiddenException($"NotPermittedToDeleteUser");
         }
 
-        // TODO: Check that Email and Username isn't taken before changing.
+        // Check if Email is taken except by myself
+        var emailUser = _userRepository.GetByEmail(mappedUser.Email);
+        if (emailUser is not null && emailUser.Id != authenticatedUserId)
+        {
+            throw new ConflictException("EmailIsAlreadyTaken");
+        }
+
+        // Check if Username is taken except by myself
+        var usernameUser = _userRepository.GetByUsername(mappedUser.Username);
+        if (usernameUser is not null && usernameUser.Id != authenticatedUserId)
+        {
+            throw new ConflictException("UsernameIsAlreadyTaken");
+        }
 
         userToUpdate.Email = mappedUser.Email;
         userToUpdate.Username = mappedUser.Username;
-        userToUpdate.Password = mappedUser.Password;
+        userToUpdate.Password = BC.HashPassword(mappedUser.Password);
 
         _userRepository.Save();
+
+        return _userMapper.UserToUserResponseDto(userToUpdate);
     }
 
     public void Delete(string userId)
     {
         var userToDelete = _userRepository.GetById(userId);
         var authenticatedUserId = _jwtHandler.GetAuthenticatedClaimValue(ClaimTypes.NameIdentifier);
+
+        if (userToDelete == null || userToDelete.DeletedAt is not null)
+        {
+            throw new BadRequestException("UserDoesNotExist");
+        }
 
         if (authenticatedUserId != userToDelete.Id)
         {

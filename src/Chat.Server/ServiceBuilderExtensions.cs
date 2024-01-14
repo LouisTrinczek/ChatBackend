@@ -23,6 +23,10 @@ public static class ServiceBuilderExtensions
 {
     public static WebApplicationBuilder AddChat(this WebApplicationBuilder self)
     {
+        self.Services.AddLogging(log =>
+        {
+            log.AddConsole();
+        });
         return self.AddDatabase()
             .AddDependencyInjection()
             .AddAuthentication()

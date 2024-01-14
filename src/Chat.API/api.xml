@@ -133,7 +133,7 @@
             Provides the REST Endpoints for the User Endpoints such as Login, Registering and user editing
             </summary>
         </member>
-        <member name="M:Chat.API.Controllers.UsersController.#ctor(Chat.Application.Contracts.Repositories.IUserRepository,Chat.Infrastructure.Database.ChatDataContext,Chat.Application.Contracts.Services.IUserService)">
+        <member name="M:Chat.API.Controllers.UsersController.#ctor(Chat.Application.Contracts.Repositories.IUserRepository,Chat.Infrastructure.Database.ChatDataContext,Chat.Application.Contracts.Services.IUserService,Microsoft.Extensions.Logging.ILogger{Chat.API.Controllers.UsersController})">
             <summary>
             Dependency Injection
             </summary>
@@ -154,6 +154,7 @@
             <response code='200'>Successfully Updated User</response>
             <response code='401'>If the user isn't logged in</response>
             <response code='403'>If the user tries to update a user he's not permitted to</response>
+            <response code='409'>If the user tries to update to a username or email that is already taken</response>
         </member>
         <member name="M:Chat.API.Controllers.UsersController.Delete(System.String)">
             <summary>Deletes a User</summary>

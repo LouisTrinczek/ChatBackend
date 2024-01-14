@@ -6,6 +6,6 @@ public interface IUserService
 {
     public void Register(UserRegistrationDto userRegistrationDto);
     public string Login(UserLoginDto userLoginDto);
-    public void Update(UserUpdateDto userUpdateDto, string userId);
+    public UserResponseDto Update(UserUpdateDto userUpdateDto, string userId);
     public void Delete(string userId);
 }
