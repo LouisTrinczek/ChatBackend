@@ -4,6 +4,7 @@ using Chat.Application.Exceptions;
 using Chat.Application.Mappers;
 using Chat.Common.Dtos;
 using Chat.Domain.Entities;
+using Chat.Infrastructure.Database;
 using Microsoft.Extensions.Logging;
 
 namespace Chat.Application.Services;
@@ -14,6 +15,7 @@ public class ServerService : IServerService
     private readonly IServerRepository _serverRepository;
     private readonly IUserService _userService;
     private readonly IChannelService _channelService;
+    private readonly ChatDataContext _dataContext;
 
     /// <summary>
     /// Dependency Injection
@@ -21,35 +23,42 @@ public class ServerService : IServerService
     public ServerService(
         IServerRepository serverRepository,
         IUserService userService,
-        IChannelService channelService
+        IChannelService channelService,
+        ChatDataContext context
     )
     {
         _serverRepository = serverRepository;
         _userService = userService;
         _channelService = channelService;
+        _dataContext = context;
     }
 
     public ServerResponseDto Create(ServerCreationDto serverCreationDto)
     {
         var serverToCreate = _serverMapper.ServerCreationDtoToServer(serverCreationDto);
         var userId = _userService.GetAuthenticatedUserId()!;
-
         var owner = _userService.GetUserById(userId);
 
-        if (owner == null)
+        var transaction = _dataContext.Database.BeginTransaction();
+
+        try
         {
-            throw new BadRequestException("UserDoesNotExist");
+            serverToCreate.Owner = owner;
+            serverToCreate.Channels.Add(new Channel() { Name = "chat" });
+            serverToCreate.UserServers.Add(
+                new UserServer() { Server = serverToCreate, User = owner }
+            );
+
+            _serverRepository.Insert(serverToCreate);
+
+            _serverRepository.Save();
+        }
+        catch (Exception e)
+        {
+            transaction.Rollback();
+            throw;
         }
 
-        serverToCreate.Owner = owner;
-        serverToCreate.Channels.Add(new Channel() { Name = "chat" });
-        serverToCreate.UserServers.Add(new UserServer() { Server = serverToCreate, User = owner });
-
-        _serverRepository.Insert(serverToCreate);
-
-        _serverRepository.Save();
-
-        // TODO: Fix Mapping of Members
         return _serverMapper.ServerToServerResponseDto(serverToCreate);
     }
 
@@ -58,13 +67,20 @@ public class ServerService : IServerService
         throw new NotImplementedException();
     }
 
-    public Server? GetServerById(string serverId)
+    public Server GetServerById(string serverId)
     {
-        return _serverRepository.GetById(serverId);
+        var server = _serverRepository.GetById(serverId);
+
+        if (server == null)
+        {
+            throw new BadRequestException("ServerDoesNotExist");
+        }
+
+        return server;
     }
 
     public void Delete(string serverId)
     {
-        throw new NotImplementedException();
+        _serverRepository.SoftDelete(serverId);
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System.Data;
+using System.Security.Authentication;
 using System.Security.Claims;
 using Chat.Application.Contracts.Repositories;
 using Chat.Application.Contracts.Security;
@@ -7,9 +8,11 @@ using Chat.Application.Exceptions;
 using Chat.Application.Mappers;
 using Chat.Common.Dtos;
 using Chat.Domain.Entities;
+using Chat.Infrastructure.Database;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 using BC = BCrypt.Net.BCrypt;
 
 namespace Chat.Application.Services;
@@ -19,16 +22,19 @@ public class UserService : IUserService
     private readonly IUserRepository _userRepository;
     private readonly UserMapper _userMapper = new UserMapper();
     private readonly IJwtHandler _jwtHandler;
+    private readonly ChatDataContext _context;
 
     public UserService(
         IUserRepository userRepository,
         IJwtHandler jwtHandler,
         IConfiguration configuration,
-        IHttpContextAccessor httpContextAccessor
+        IHttpContextAccessor httpContextAccessor,
+        ChatDataContext context
     )
     {
         _userRepository = userRepository;
         _jwtHandler = jwtHandler;
+        _context = context;
     }
 
     /// <summary>
@@ -39,6 +45,7 @@ public class UserService : IUserService
     /// <exception cref="CustomException"></exception>
     public UserResponseDto Register(UserRegistrationDto userRegistrationDto)
     {
+        var transaction = _context.Database.BeginTransaction();
         var user = _userMapper.UserRegistrationDtoToUser(userRegistrationDto);
 
         if (userRegistrationDto.Password.Length < 7)
@@ -61,9 +68,16 @@ public class UserService : IUserService
             throw new DuplicateNameException("UserAlreadyExists");
         }
 
-        _userRepository.Insert(user);
+        try
+        {
+            _userRepository.Insert(user);
 
-        _userRepository.Save();
+            _userRepository.Save();
+        }
+        catch (Exception e)
+        {
+            transaction.Rollback();
+        }
 
         return _userMapper.UserToUserResponseDto(user);
     }
@@ -110,6 +124,7 @@ public class UserService : IUserService
         var userToUpdate = _userRepository.GetById(userId);
         var mappedUser = _userMapper.UserUpdateDtoToUser(userUpdateDto);
         var authenticatedUserId = _jwtHandler.GetAuthenticatedClaimValue(ClaimTypes.NameIdentifier);
+        var transaction = _context.Database.BeginTransaction();
 
         if (userToUpdate == null || userToUpdate.DeletedAt is not null)
         {
@@ -139,7 +154,15 @@ public class UserService : IUserService
         userToUpdate.Username = mappedUser.Username;
         userToUpdate.Password = BC.HashPassword(mappedUser.Password);
 
-        _userRepository.Save();
+        try
+        {
+            _userRepository.Save();
+        }
+        catch (Exception e)
+        {
+            transaction.Rollback();
+            throw;
+        }
 
         return _userMapper.UserToUserResponseDto(userToUpdate);
     }
@@ -148,6 +171,7 @@ public class UserService : IUserService
     {
         var userToDelete = _userRepository.GetById(userId);
         var authenticatedUserId = _jwtHandler.GetAuthenticatedClaimValue(ClaimTypes.NameIdentifier);
+        var transaction = _context.Database.BeginTransaction();
 
         if (userToDelete == null || userToDelete.DeletedAt is not null)
         {
@@ -164,17 +188,39 @@ public class UserService : IUserService
             throw new BadRequestException($"UserDoesNotExist");
         }
 
-        _userRepository.SoftDelete(userId);
-        _userRepository.Save();
+        try
+        {
+            _userRepository.SoftDelete(userId);
+            _userRepository.Save();
+        }
+        catch (Exception e)
+        {
+            transaction.Rollback();
+            throw;
+        }
     }
 
-    public User? GetUserById(string userId)
+    public User GetUserById(string userId)
     {
-        return _userRepository.GetById(userId);
+        var user = _userRepository.GetById(userId);
+
+        if (user == null)
+        {
+            throw new BadRequestException("UserDoesNotExist");
+        }
+
+        return user;
     }
 
-    public string? GetAuthenticatedUserId()
+    public string GetAuthenticatedUserId()
     {
-        return _jwtHandler.GetAuthenticatedClaimValue(ClaimTypes.NameIdentifier);
+        var value = _jwtHandler.GetAuthenticatedClaimValue(ClaimTypes.NameIdentifier);
+
+        if (value == null || value.IsNullOrEmpty())
+        {
+            throw new AuthenticationException("UserNotLoggedIn");
+        }
+
+        return value;
     }
 }

@@ -20,6 +20,7 @@
       <ProjectReference Include="..\Chat.Application.Contracts\Chat.Application.Contracts.csproj" />
       <ProjectReference Include="..\Chat.Common\Chat.Common.csproj" />
       <ProjectReference Include="..\Chat.Domain\Chat.Domain.csproj" />
+      <ProjectReference Include="..\Chat.Infrastructure\Chat.Infrastructure.csproj" />
     </ItemGroup>
 
 </Project>
