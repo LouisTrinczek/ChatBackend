@@ -49,7 +49,7 @@ public class UsersController : ControllerBase
             var userResponseDto = _userService.Register(userRegistrationDto);
             return Ok(
                 new ApiResponse<UserResponseDto>(
-                    ResponseStatus.Error,
+                    ResponseStatus.Success,
                     userResponseDto,
                     new string[] { }
                 )
@@ -103,7 +103,7 @@ public class UsersController : ControllerBase
         try
         {
             var token = _userService.Login(userLoginDto);
-            return Ok(new ApiResponse<string>(ResponseStatus.Error, token, new string[] { }));
+            return Ok(new ApiResponse<string>(ResponseStatus.Success, token, new string[] { }));
         }
         catch (Exception e)
         {
@@ -153,7 +153,7 @@ public class UsersController : ControllerBase
             var userResponseDto = _userService.Update(userUpdateDto, userId);
             return Ok(
                 new ApiResponse<UserResponseDto>(
-                    ResponseStatus.Error,
+                    ResponseStatus.Success,
                     userResponseDto,
                     new string[] { }
                 )
@@ -235,7 +235,7 @@ public class UsersController : ControllerBase
         try
         {
             _userService.Delete(userId);
-            return Ok(new ApiResponse<object>(ResponseStatus.Error, null, new string[] { }));
+            return Ok(new ApiResponse<object>(ResponseStatus.Success, null, new string[] { }));
         }
         catch (Exception e)
         {

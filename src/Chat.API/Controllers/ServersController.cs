@@ -1,9 +1,12 @@
 ﻿using System.Net.Mime;
 using Chat.Application.Contracts.Services;
 using Chat.Application.Exceptions;
+using Chat.Application.Mappers;
 using Chat.Common.Dtos;
 using Chat.Common.Types;
+using Chat.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -21,6 +24,7 @@ public class ServersController : ControllerBase
 {
     private readonly ILogger<ServersController> _logger;
     private readonly IServerService _serverService;
+    private readonly ServerMapper _serverMapper = new ServerMapper();
 
     /// <summary>
     /// Dependency Injection
@@ -44,10 +48,13 @@ public class ServersController : ControllerBase
     {
         try
         {
-            var serverResponseDto = _serverService.Create(serverCreationDto);
+            Server server = _serverService.Create(serverCreationDto);
+
+            var serverResponseDto = _serverMapper.ServerToServerResponseDto(server);
+
             return Ok(
                 new ApiResponse<ServerResponseDto>(
-                    ResponseStatus.Error,
+                    ResponseStatus.Success,
                     serverResponseDto,
                     new string[] { }
                 )
@@ -91,9 +98,57 @@ public class ServersController : ControllerBase
     [Produces(typeof(ApiResponse<ServerResponseDto>))]
     [Consumes(typeof(ServerResponseDto), MediaTypeNames.Application.Json)]
     [Authorize]
-    public string Update([FromBody] ServerUpdateDto serverUpdateDto)
+    public IActionResult Update(
+        [FromBody] ServerUpdateDto serverUpdateDto,
+        [FromRoute] string serverId
+    )
     {
-        return "Not Implemented";
+        try
+        {
+            Server server = _serverService.Update(serverUpdateDto, serverId);
+            var serverResponseDto = _serverMapper.ServerToServerResponseDto(server);
+
+            return Ok(
+                new ApiResponse<ServerResponseDto>(
+                    ResponseStatus.Success,
+                    serverResponseDto,
+                    new string[] { }
+                )
+            );
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e.ToString());
+            ObjectResult exception = e switch
+            {
+                BadRequestException
+                    => BadRequest(
+                        new ApiResponse<object>(
+                            ResponseStatus.Success,
+                            null,
+                            new string[] { e.Message }
+                        )
+                    ),
+                ForbiddenException
+                    => new Forbidden(
+                        new ApiResponse<object>(
+                            ResponseStatus.Error,
+                            null,
+                            new string[] { e.Message }
+                        )
+                    ),
+                _
+                    => BadRequest(
+                        new ApiResponse<object>(
+                            ResponseStatus.Error,
+                            null,
+                            new string[] { "UnknownError" }
+                        )
+                    ),
+            };
+
+            return exception;
+        }
     }
 
     /// <summary>Deletes a Server</summary>
@@ -106,9 +161,48 @@ public class ServersController : ControllerBase
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [Produces(typeof(ApiResponse<string>))]
     [Authorize]
-    public string Delete()
+    public IActionResult Delete([FromRoute] string serverId)
     {
-        return "Not Implemented";
+        try
+        {
+            _serverService.Delete(serverId);
+            return Ok(
+                new ApiResponse<ServerResponseDto>(ResponseStatus.Success, null, new string[] { })
+            );
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e.ToString());
+            ObjectResult exception = e switch
+            {
+                BadRequestException
+                    => BadRequest(
+                        new ApiResponse<object>(
+                            ResponseStatus.Error,
+                            null,
+                            new string[] { e.Message }
+                        )
+                    ),
+                ForbiddenException
+                    => new Forbidden(
+                        new ApiResponse<object>(
+                            ResponseStatus.Error,
+                            null,
+                            new string[] { e.Message }
+                        )
+                    ),
+                _
+                    => BadRequest(
+                        new ApiResponse<object>(
+                            ResponseStatus.Error,
+                            null,
+                            new string[] { "UnknownError" }
+                        )
+                    ),
+            };
+
+            return exception;
+        }
     }
 
     /// <summary>Gets a Server</summary>
@@ -121,8 +215,53 @@ public class ServersController : ControllerBase
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [Produces(typeof(ApiResponse<ServerResponseDto>))]
     [Authorize]
-    public string Get()
+    public IActionResult Get([FromRoute] string serverId)
     {
-        return "String";
+        try
+        {
+            Server server = _serverService.GetServerById(serverId);
+            ServerResponseDto serverResponseDto = _serverMapper.ServerToServerResponseDto(server);
+
+            return Ok(
+                new ApiResponse<ServerResponseDto>(
+                    ResponseStatus.Success,
+                    serverResponseDto,
+                    new string[] { }
+                )
+            );
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e.ToString());
+            ObjectResult exception = e switch
+            {
+                BadRequestException
+                    => BadRequest(
+                        new ApiResponse<object>(
+                            ResponseStatus.Error,
+                            null,
+                            new string[] { e.Message }
+                        )
+                    ),
+                ForbiddenException
+                    => new Forbidden(
+                        new ApiResponse<object>(
+                            ResponseStatus.Error,
+                            null,
+                            new string[] { e.Message }
+                        )
+                    ),
+                _
+                    => BadRequest(
+                        new ApiResponse<object>(
+                            ResponseStatus.Error,
+                            null,
+                            new string[] { "UnknownError" }
+                        )
+                    ),
+            };
+
+            return exception;
+        }
     }
 }

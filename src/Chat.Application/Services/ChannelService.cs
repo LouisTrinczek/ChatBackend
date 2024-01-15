@@ -40,4 +40,14 @@ public class ChannelService : IChannelService
 
         return channel;
     }
+
+    public Channel Update(ServerChannelUpdateDto serverChannelUpdateDto, string channelId)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void Delete(string channelId)
+    {
+        throw new NotImplementedException();
+    }
 }

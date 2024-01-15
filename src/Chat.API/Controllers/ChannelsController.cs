@@ -1,5 +1,6 @@
 ﻿using System.Net.Mime;
 using Chat.Application.Contracts.Repositories;
+using Chat.Application.Contracts.Services;
 using Chat.Common.Dtos;
 using Chat.Common.Types;
 using Chat.Domain.Entities;
@@ -21,13 +22,15 @@ namespace Chat.API.Controllers;
 public class ChannelsController
 {
     private IGenericRepository<Channel> _genericRepository;
+    private IChannelService _channelService;
 
     /// <summary>
     /// Dependency Injection
     /// </summary>
-    public ChannelsController(ChatDataContext chatDataContext)
+    public ChannelsController(ChatDataContext chatDataContext, IChannelService channelService)
     {
         _genericRepository = new GenericRepository<Channel>(chatDataContext);
+        _channelService = channelService;
     }
 
     /// <summary>Creates a Channel</summary>

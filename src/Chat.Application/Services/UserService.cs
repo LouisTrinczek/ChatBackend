@@ -121,7 +121,7 @@ public class UserService : IUserService
 
     public UserResponseDto Update(UserUpdateDto userUpdateDto, string userId)
     {
-        var userToUpdate = _userRepository.GetById(userId);
+        var userToUpdate = this.GetUserById(userId);
         var mappedUser = _userMapper.UserUpdateDtoToUser(userUpdateDto);
         var authenticatedUserId = _jwtHandler.GetAuthenticatedClaimValue(ClaimTypes.NameIdentifier);
         var transaction = _context.Database.BeginTransaction();
@@ -204,7 +204,7 @@ public class UserService : IUserService
     {
         var user = _userRepository.GetById(userId);
 
-        if (user == null)
+        if (user == null || user.DeletedAt is not null)
         {
             throw new BadRequestException("UserDoesNotExist");
         }

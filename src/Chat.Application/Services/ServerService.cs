@@ -1,4 +1,5 @@
-﻿using Chat.Application.Contracts.Repositories;
+﻿using System.Security.Authentication;
+using Chat.Application.Contracts.Repositories;
 using Chat.Application.Contracts.Services;
 using Chat.Application.Exceptions;
 using Chat.Application.Mappers;
@@ -33,7 +34,7 @@ public class ServerService : IServerService
         _dataContext = context;
     }
 
-    public ServerResponseDto Create(ServerCreationDto serverCreationDto)
+    public Server Create(ServerCreationDto serverCreationDto)
     {
         var serverToCreate = _serverMapper.ServerCreationDtoToServer(serverCreationDto);
         var userId = _userService.GetAuthenticatedUserId()!;
@@ -59,21 +60,53 @@ public class ServerService : IServerService
             throw;
         }
 
-        return _serverMapper.ServerToServerResponseDto(serverToCreate);
+        return serverToCreate;
     }
 
-    public ServerResponseDto Update(ServerUpdateDto serverUpdateDto, string serverId)
+    public Server Update(ServerUpdateDto serverUpdateDto, string serverId)
     {
-        throw new NotImplementedException();
+        var transaction = _dataContext.Database.BeginTransaction();
+
+        var updatedServer = this.GetServerById(serverId);
+        var updatingUserId = _userService.GetAuthenticatedUserId();
+
+        if (updatedServer.Owner.Id != updatingUserId)
+        {
+            throw new ForbiddenException("UserIsNotServerOwner");
+        }
+
+        updatedServer.Name = serverUpdateDto.Name;
+
+        try
+        {
+            _serverRepository.Save();
+        }
+        catch (Exception e)
+        {
+            transaction.Rollback();
+            throw;
+        }
+
+        return updatedServer;
     }
 
     public Server GetServerById(string serverId)
     {
         var server = _serverRepository.GetById(serverId);
+        var authenticatedUserId = _userService.GetAuthenticatedUserId();
 
         if (server == null)
         {
             throw new BadRequestException("ServerDoesNotExist");
+        }
+
+        var userIsMember = server
+            .UserServers.Select(c => c.UserId == authenticatedUserId)
+            .FirstOrDefault();
+
+        if (!userIsMember)
+        {
+            throw new ForbiddenException("UserIsNotAServerMember");
         }
 
         return server;
@@ -81,6 +114,14 @@ public class ServerService : IServerService
 
     public void Delete(string serverId)
     {
+        var serverToDelete = this.GetServerById(serverId);
+        var deletingUserId = _userService.GetAuthenticatedUserId();
+
+        if (serverToDelete.Owner.Id != deletingUserId)
+        {
+            throw new ForbiddenException("UserIsNotServerOwner");
+        }
+
         _serverRepository.SoftDelete(serverId);
     }
 }

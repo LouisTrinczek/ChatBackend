@@ -110,19 +110,19 @@
             <response code='200'>Successfully Created Server</response>
             <response code='401'>If the user isn't logged in</response>
         </member>
-        <member name="M:Chat.API.Controllers.ServersController.Update(Chat.Common.Dtos.ServerUpdateDto)">
+        <member name="M:Chat.API.Controllers.ServersController.Update(Chat.Common.Dtos.ServerUpdateDto,System.String)">
             <summary>Updates a Server</summary>
             <response code='200'>Successfully updated Server</response>
             <response code='401'>If the user isn't logged in</response>
             <response code='403'>If the user tries to update a Server he's not permitted to</response>
         </member>
-        <member name="M:Chat.API.Controllers.ServersController.Delete">
+        <member name="M:Chat.API.Controllers.ServersController.Delete(System.String)">
             <summary>Deletes a Server</summary>
             <response code='200'>Successfully Deleted Server</response>
             <response code='401'>If the user isn't logged in</response>
             <response code='403'>If the user tries to delete a Server he's not permitted to</response>
         </member>
-        <member name="M:Chat.API.Controllers.ServersController.Get">
+        <member name="M:Chat.API.Controllers.ServersController.Get(System.String)">
             <summary>Gets a Server</summary>
             <response code='200'>Successfully Get Server</response>
             <response code='401'>If the user isn't logged in</response>
