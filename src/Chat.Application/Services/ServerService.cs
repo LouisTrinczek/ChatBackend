@@ -7,6 +7,7 @@ using Chat.Common.Dtos;
 using Chat.Domain.Entities;
 using Chat.Infrastructure.Database;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Chat.Application.Services;
 
@@ -15,7 +16,6 @@ public class ServerService : IServerService
     private readonly ServerMapper _serverMapper = new ServerMapper();
     private readonly IServerRepository _serverRepository;
     private readonly IUserService _userService;
-    private readonly IChannelService _channelService;
     private readonly ChatDataContext _dataContext;
 
     /// <summary>
@@ -24,13 +24,11 @@ public class ServerService : IServerService
     public ServerService(
         IServerRepository serverRepository,
         IUserService userService,
-        IChannelService channelService,
         ChatDataContext context
     )
     {
         _serverRepository = serverRepository;
         _userService = userService;
-        _channelService = channelService;
         _dataContext = context;
     }
 
@@ -93,7 +91,7 @@ public class ServerService : IServerService
         var server = _serverRepository.GetById(serverId);
         var authenticatedUserId = _userService.GetAuthenticatedUserId();
 
-        if (server == null)
+        if (server == null || server.DeletedAt is not null)
         {
             throw new BadRequestException("ServerDoesNotExist");
         }

@@ -1,6 +1,8 @@
-﻿using System.Net.Mime;
+﻿using System.Data;
+using System.Net.Mime;
 using Chat.Application.Contracts.Repositories;
 using Chat.Application.Contracts.Services;
+using Chat.Application.Mappers;
 using Chat.Common.Dtos;
 using Chat.Common.Types;
 using Chat.Domain.Entities;
@@ -9,6 +11,7 @@ using Chat.Infrastructure.Database.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 namespace Chat.API.Controllers;
 
@@ -19,18 +22,25 @@ namespace Chat.API.Controllers;
 [ApiVersion("1")]
 [Route("/api/v{version:apiVersion}/servers/{serverId}/[controller]")]
 [Produces(MediaTypeNames.Application.Json)]
-public class ChannelsController
+public class ChannelsController : ControllerBase
 {
-    private IGenericRepository<Channel> _genericRepository;
-    private IChannelService _channelService;
+    private readonly IGenericRepository<Channel> _genericRepository;
+    private readonly IChannelService _channelService;
+    private readonly ChannelMapper _channelMapper = new ChannelMapper();
+    private readonly ILogger<ChannelsController> _logger;
 
     /// <summary>
     /// Dependency Injection
     /// </summary>
-    public ChannelsController(ChatDataContext chatDataContext, IChannelService channelService)
+    public ChannelsController(
+        ChatDataContext chatDataContext,
+        IChannelService channelService,
+        ILogger<ChannelsController> logger
+    )
     {
         _genericRepository = new GenericRepository<Channel>(chatDataContext);
         _channelService = channelService;
+        _logger = logger;
     }
 
     /// <summary>Creates a Channel</summary>
@@ -44,9 +54,58 @@ public class ChannelsController
     [Consumes(typeof(ServerChannelCreateDto), MediaTypeNames.Application.Json)]
     [Produces(typeof(ApiResponse<ServerChannelResponseDto>))]
     [Authorize]
-    public string Create([FromBody] ServerChannelCreateDto serverChannelCreateDto)
+    public IActionResult Create(
+        [FromBody] ServerChannelCreateDto serverChannelCreateDto,
+        [FromRoute] string serverId
+    )
     {
-        return "Not Implemented";
+        try
+        {
+            Channel channel = _channelService.Create(serverChannelCreateDto, serverId);
+            ServerChannelResponseDto serverChannelResponse =
+                _channelMapper.ServerChannelToChannelResponseDto(channel);
+
+            return Ok(
+                new ApiResponse<ServerChannelResponseDto>(
+                    ResponseStatus.Success,
+                    serverChannelResponse,
+                    new string[] { }
+                )
+            );
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e.ToString());
+            ObjectResult exception = e switch
+            {
+                DuplicateNameException
+                    => Conflict(
+                        new ApiResponse<object>(
+                            ResponseStatus.Error,
+                            null,
+                            new string[] { e.Message }
+                        )
+                    ),
+                InvalidDataException
+                    => BadRequest(
+                        new ApiResponse<object>(
+                            ResponseStatus.Error,
+                            null,
+                            new string[] { e.Message }
+                        )
+                    ),
+                _
+                    => BadRequest(
+                        new ApiResponse<object>(
+                            ResponseStatus.Error,
+                            null,
+                            new string[] { "UnknownError" }
+                        )
+                    ),
+            };
+
+            return exception;
+        }
     }
 
     /// <summary>Updates a Channel</summary>

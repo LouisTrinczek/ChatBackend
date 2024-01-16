@@ -9,12 +9,12 @@
             Provides the REST Endpoints for the Server Channels like Creation, Deletion and Updating
             </summary>
         </member>
-        <member name="M:Chat.API.Controllers.ChannelsController.#ctor(Chat.Infrastructure.Database.ChatDataContext,Chat.Application.Contracts.Services.IChannelService)">
+        <member name="M:Chat.API.Controllers.ChannelsController.#ctor(Chat.Infrastructure.Database.ChatDataContext,Chat.Application.Contracts.Services.IChannelService,Microsoft.Extensions.Logging.ILogger{Chat.API.Controllers.ChannelsController})">
             <summary>
             Dependency Injection
             </summary>
         </member>
-        <member name="M:Chat.API.Controllers.ChannelsController.Create(Chat.Common.Dtos.ServerChannelCreateDto)">
+        <member name="M:Chat.API.Controllers.ChannelsController.Create(Chat.Common.Dtos.ServerChannelCreateDto,System.String)">
             <summary>Creates a Channel</summary>
             <response code='200'>Successfully Created Channel</response>
             <response code='401'>If the user isn't logged in</response>

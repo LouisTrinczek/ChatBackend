@@ -87,6 +87,12 @@ public static class ServiceBuilderExtensions
         self.Services.AddScoped<IChannelRepository, ChannelRepository>();
         self.Services.AddScoped<IJwtHandler, JwtHandler>();
         self.Services.AddHttpContextAccessor();
+        self.Services.AddScoped<Lazy<IChannelService>>(
+            provider => new Lazy<IChannelService>(provider.GetRequiredService<IChannelService>)
+        );
+        self.Services.AddScoped<Lazy<IServerService>>(
+            provider => new Lazy<IServerService>(provider.GetRequiredService<IServerService>)
+        );
         return self;
     }
 
