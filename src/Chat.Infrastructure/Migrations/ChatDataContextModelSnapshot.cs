@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace Chat.Infrastructure.Database.Migrations
+namespace Chat.Infrastructure.Migrations
 {
     [DbContext(typeof(ChatDataContext))]
     partial class ChatDataContextModelSnapshot : ModelSnapshot

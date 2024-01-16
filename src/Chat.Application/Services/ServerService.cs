@@ -53,6 +53,7 @@ public class ServerService : IServerService
             _serverRepository.Insert(serverToCreate);
 
             _serverRepository.Save();
+            transaction.Commit();
         }
         catch (Exception e)
         {
@@ -68,18 +69,15 @@ public class ServerService : IServerService
         var transaction = _dataContext.Database.BeginTransaction();
 
         var updatedServer = this.GetServerById(serverId);
-        var updatingUserId = _userService.GetAuthenticatedUserId();
 
-        if (updatedServer.Owner.Id != updatingUserId)
-        {
-            throw new ForbiddenException("UserIsNotServerOwner");
-        }
+        this.CheckIfAuthenticatedUserIsOwner(updatedServer);
 
         updatedServer.Name = serverUpdateDto.Name;
 
         try
         {
             _serverRepository.Save();
+            transaction.Commit();
         }
         catch (Exception e)
         {
@@ -115,13 +113,30 @@ public class ServerService : IServerService
     public void Delete(string serverId)
     {
         var serverToDelete = this.GetServerById(serverId);
-        var deletingUserId = _userService.GetAuthenticatedUserId();
+        var transaction = _dataContext.Database.BeginTransaction();
 
-        if (serverToDelete.Owner.Id != deletingUserId)
+        this.CheckIfAuthenticatedUserIsOwner(serverToDelete);
+
+        try
+        {
+            _serverRepository.SoftDelete(serverId);
+            _serverRepository.Save();
+            transaction.Commit();
+        }
+        catch (Exception e)
+        {
+            transaction.Rollback();
+            throw;
+        }
+    }
+
+    public void CheckIfAuthenticatedUserIsOwner(Server server)
+    {
+        var authenticatedUserId = _userService.GetAuthenticatedUserId();
+
+        if (server.Owner.Id != authenticatedUserId)
         {
             throw new ForbiddenException("UserIsNotServerOwner");
         }
-
-        _serverRepository.SoftDelete(serverId);
     }
 }

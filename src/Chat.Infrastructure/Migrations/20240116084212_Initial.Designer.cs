@@ -8,10 +8,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace Chat.Infrastructure.Database.Migrations
+namespace Chat.Infrastructure.Migrations
 {
     [DbContext(typeof(ChatDataContext))]
-    [Migration("20240115200814_Initial")]
+    [Migration("20240116084212_Initial")]
     partial class Initial
     {
         /// <inheritdoc />

@@ -31,6 +31,7 @@ public class ChannelService : IChannelService
         {
             _channelRepository.Insert(channel);
             _channelRepository.Save();
+            transaction.Commit();
         }
         catch (Exception e)
         {

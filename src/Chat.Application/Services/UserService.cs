@@ -73,10 +73,12 @@ public class UserService : IUserService
             _userRepository.Insert(user);
 
             _userRepository.Save();
+            transaction.Commit();
         }
         catch (Exception e)
         {
             transaction.Rollback();
+            throw;
         }
 
         return _userMapper.UserToUserResponseDto(user);
@@ -157,6 +159,7 @@ public class UserService : IUserService
         try
         {
             _userRepository.Save();
+            transaction.Commit();
         }
         catch (Exception e)
         {
@@ -192,6 +195,7 @@ public class UserService : IUserService
         {
             _userRepository.SoftDelete(userId);
             _userRepository.Save();
+            transaction.Commit();
         }
         catch (Exception e)
         {

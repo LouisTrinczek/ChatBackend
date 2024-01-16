@@ -9,7 +9,7 @@
             Provides the REST Endpoints for the Server Channels like Creation, Deletion and Updating
             </summary>
         </member>
-        <member name="M:Chat.API.Controllers.ChannelsController.#ctor(Chat.Infrastructure.Database.ChatDataContext)">
+        <member name="M:Chat.API.Controllers.ChannelsController.#ctor(Chat.Infrastructure.Database.ChatDataContext,Chat.Application.Contracts.Services.IChannelService)">
             <summary>
             Dependency Injection
             </summary>
