@@ -2,6 +2,7 @@
 using System.Net.Mime;
 using Chat.Application.Contracts.Repositories;
 using Chat.Application.Contracts.Services;
+using Chat.Application.Exceptions;
 using Chat.Application.Mappers;
 using Chat.Common.Dtos;
 using Chat.Common.Types;
@@ -78,16 +79,8 @@ public class ChannelsController : ControllerBase
             _logger.LogError(e.ToString());
             ObjectResult exception = e switch
             {
-                DuplicateNameException
-                    => Conflict(
-                        new ApiResponse<object>(
-                            ResponseStatus.Error,
-                            null,
-                            new string[] { e.Message }
-                        )
-                    ),
-                InvalidDataException
-                    => BadRequest(
+                ForbiddenException
+                    => new Forbidden(
                         new ApiResponse<object>(
                             ResponseStatus.Error,
                             null,
@@ -110,33 +103,124 @@ public class ChannelsController : ControllerBase
 
     /// <summary>Updates a Channel</summary>
     /// <response code='200'>Successfully Updated Channel</response>
+    /// <response code='400'>If the user tries to access a channel that is not part of the server</response>
     /// <response code='401'>If the user isn't logged in</response>
     /// <response code='403'>If the user tries to update a Channel he's not permitted to</response>
     [HttpPut("{channelId}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [Consumes(typeof(ServerChannelUpdateDto), MediaTypeNames.Application.Json)]
     [Produces(typeof(ApiResponse<ServerChannelResponseDto>))]
     [Authorize]
-    public string Update([FromBody] ServerChannelUpdateDto serverChannelUpdateDto)
+    public IActionResult Update(
+        [FromBody] ServerChannelUpdateDto serverChannelUpdateDto,
+        [FromRoute] string serverId,
+        [FromRoute] string channelId
+    )
     {
-        return "Not Implemented";
+        try
+        {
+            Channel channel = _channelService.Update(serverChannelUpdateDto, serverId, channelId);
+            ServerChannelResponseDto serverChannelResponse =
+                _channelMapper.ServerChannelToChannelResponseDto(channel);
+
+            return Ok(
+                new ApiResponse<ServerChannelResponseDto>(
+                    ResponseStatus.Success,
+                    serverChannelResponse,
+                    new string[] { }
+                )
+            );
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e.ToString());
+            ObjectResult exception = e switch
+            {
+                BadRequestException
+                    => BadRequest(
+                        new ApiResponse<object>(
+                            ResponseStatus.Error,
+                            null,
+                            new string[] { e.Message }
+                        )
+                    ),
+                ForbiddenException
+                    => new Forbidden(
+                        new ApiResponse<object>(
+                            ResponseStatus.Error,
+                            null,
+                            new string[] { e.Message }
+                        )
+                    ),
+                _
+                    => BadRequest(
+                        new ApiResponse<object>(
+                            ResponseStatus.Error,
+                            null,
+                            new string[] { "UnknownError" }
+                        )
+                    ),
+            };
+
+            return exception;
+        }
     }
 
     /// <summary>Deletes a Channel</summary>
     /// <response code='200'>Successfully Deleted Channel</response>
+    /// <response code='400'>If the user tries to access a channel that is not part of the server</response>
     /// <response code='401'>If the user isn't logged in</response>
     /// <response code='403'>If the user tries to delete a Channel he's not permitted to</response>
     [HttpDelete("{channelId}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [Produces(typeof(ApiResponse<string>))]
     [Authorize]
-    public string Delete()
+    public IActionResult Delete([FromRoute] string serverId, [FromRoute] string channelId)
     {
-        return "Not Implemented";
+        try
+        {
+            _channelService.Delete(serverId, channelId);
+            return Ok(new ApiResponse<object>(ResponseStatus.Success, null, new string[] { }));
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e.ToString());
+            ObjectResult exception = e switch
+            {
+                BadRequestException
+                    => BadRequest(
+                        new ApiResponse<object>(
+                            ResponseStatus.Error,
+                            null,
+                            new string[] { e.Message }
+                        )
+                    ),
+                ForbiddenException
+                    => new Forbidden(
+                        new ApiResponse<object>(
+                            ResponseStatus.Error,
+                            null,
+                            new string[] { e.Message }
+                        )
+                    ),
+                _
+                    => BadRequest(
+                        new ApiResponse<object>(
+                            ResponseStatus.Error,
+                            null,
+                            new string[] { "UnknownError" }
+                        )
+                    ),
+            };
+
+            return exception;
+        }
     }
 
     /// <summary>Gets a Channel</summary>
@@ -149,9 +233,54 @@ public class ChannelsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [Produces(typeof(ApiResponse<ServerChannelResponseDto>))]
     [Authorize]
-    public string Get()
+    public IActionResult Get([FromRoute] string serverId, [FromRoute] string channelId)
     {
-        return "String";
+        try
+        {
+            // TODO: Return Messages with this request
+            var channel = _channelService.GetChannelById(serverId, channelId);
+            var channelResponseDto = _channelMapper.ServerChannelToChannelResponseDto(channel);
+            return Ok(
+                new ApiResponse<ServerChannelResponseDto>(
+                    ResponseStatus.Success,
+                    channelResponseDto,
+                    new string[] { }
+                )
+            );
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e.ToString());
+            ObjectResult exception = e switch
+            {
+                BadRequestException
+                    => BadRequest(
+                        new ApiResponse<object>(
+                            ResponseStatus.Error,
+                            null,
+                            new string[] { e.Message }
+                        )
+                    ),
+                ForbiddenException
+                    => new Forbidden(
+                        new ApiResponse<object>(
+                            ResponseStatus.Error,
+                            null,
+                            new string[] { e.Message }
+                        )
+                    ),
+                _
+                    => BadRequest(
+                        new ApiResponse<object>(
+                            ResponseStatus.Error,
+                            null,
+                            new string[] { "UnknownError" }
+                        )
+                    ),
+            };
+
+            return exception;
+        }
     }
 
     /// <summary>Gets all Channels within the server</summary>

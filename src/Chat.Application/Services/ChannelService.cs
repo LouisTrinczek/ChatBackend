@@ -29,9 +29,12 @@ public class ChannelService : IChannelService
 
     public Channel Create(ServerChannelCreateDto serverChannelCreateDto, string serverId)
     {
-        var channel = _channelMapper.ServerChannelCreateDtoToChannel(serverChannelCreateDto);
         var transaction = _context.Database.BeginTransaction();
         var server = _serverService.GetServerById(serverId);
+
+        _serverService.CheckIfAuthenticatedUserIsOwner(server);
+
+        var channel = _channelMapper.ServerChannelCreateDtoToChannel(serverChannelCreateDto);
 
         channel.Server = server;
 
@@ -50,10 +53,17 @@ public class ChannelService : IChannelService
         return channel;
     }
 
-    public Channel Update(ServerChannelUpdateDto serverChannelUpdateDto, string channelId)
+    public Channel Update(
+        ServerChannelUpdateDto serverChannelUpdateDto,
+        string serverId,
+        string channelId
+    )
     {
         var transaction = _context.Database.BeginTransaction();
-        var updatedChannel = this.GetChannelById(channelId);
+        var updatedChannel = this.GetChannelById(serverId, channelId);
+
+        _serverService.CheckIfAuthenticatedUserIsOwner(updatedChannel.Server);
+
         updatedChannel.Name = serverChannelUpdateDto.Name;
 
         try
@@ -70,10 +80,12 @@ public class ChannelService : IChannelService
         return updatedChannel;
     }
 
-    public void Delete(string channelId)
+    public void Delete(string serverId, string channelId)
     {
         var transaction = _context.Database.BeginTransaction();
-        var channelToDelete = this.GetChannelById(channelId);
+        var channelToDelete = this.GetChannelById(serverId, channelId);
+
+        _serverService.CheckIfAuthenticatedUserIsOwner(channelToDelete.Server);
 
         try
         {
@@ -88,8 +100,9 @@ public class ChannelService : IChannelService
         }
     }
 
-    public Channel GetChannelById(string channelId)
+    public Channel GetChannelById(string serverId, string channelId)
     {
+        this.CheckIfChannelIsPartOfServer(serverId, channelId);
         Channel? channel = _channelRepository.GetById(channelId);
 
         if (channel == null || channel.DeletedAt is not null)
@@ -98,5 +111,17 @@ public class ChannelService : IChannelService
         }
 
         return channel;
+    }
+
+    public void CheckIfChannelIsPartOfServer(string serverId, string channelId)
+    {
+        Server server = _serverService.GetServerById(serverId);
+
+        var channelIsPartOfServer = server.Channels.Select(c => c.Id == channelId).FirstOrDefault();
+
+        if (!channelIsPartOfServer)
+        {
+            throw new BadRequestException("ChannelIsNotPartOfServer");
+        }
     }
 }

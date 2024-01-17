@@ -22,8 +22,4 @@
       <ProjectReference Include="..\Chat.Application.Contracts\Chat.Application.Contracts.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Database\Migrations\" />
-    </ItemGroup>
-
 </Project>

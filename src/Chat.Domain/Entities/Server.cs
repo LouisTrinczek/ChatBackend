@@ -14,6 +14,6 @@ public class Server : BaseEntity
     public string? IconUrl { get; set; } = null!;
 
     public User Owner { get; set; } = null!;
-    public ICollection<Channel> Channels { get; } = new List<Channel>();
-    public ICollection<UserServer> UserServers { get; } = new List<UserServer>();
+    public ICollection<Channel> Channels { get; set; } = new List<Channel>();
+    public ICollection<UserServer> UserServers { get; set; } = new List<UserServer>();
 }

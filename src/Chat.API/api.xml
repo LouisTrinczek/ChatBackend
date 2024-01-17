@@ -20,19 +20,21 @@
             <response code='401'>If the user isn't logged in</response>
             <response code='403'>If the user tries to create a Channel he's not permitted to</response>
         </member>
-        <member name="M:Chat.API.Controllers.ChannelsController.Update(Chat.Common.Dtos.ServerChannelUpdateDto)">
+        <member name="M:Chat.API.Controllers.ChannelsController.Update(Chat.Common.Dtos.ServerChannelUpdateDto,System.String,System.String)">
             <summary>Updates a Channel</summary>
             <response code='200'>Successfully Updated Channel</response>
+            <response code='400'>If the user tries to access a channel that is not part of the server</response>
             <response code='401'>If the user isn't logged in</response>
             <response code='403'>If the user tries to update a Channel he's not permitted to</response>
         </member>
-        <member name="M:Chat.API.Controllers.ChannelsController.Delete">
+        <member name="M:Chat.API.Controllers.ChannelsController.Delete(System.String,System.String)">
             <summary>Deletes a Channel</summary>
             <response code='200'>Successfully Deleted Channel</response>
+            <response code='400'>If the user tries to access a channel that is not part of the server</response>
             <response code='401'>If the user isn't logged in</response>
             <response code='403'>If the user tries to delete a Channel he's not permitted to</response>
         </member>
-        <member name="M:Chat.API.Controllers.ChannelsController.Get">
+        <member name="M:Chat.API.Controllers.ChannelsController.Get(System.String,System.String)">
             <summary>Gets a Channel</summary>
             <response code='200'>Successfully Get Channel</response>
             <response code='401'>If the user isn't logged in</response>
