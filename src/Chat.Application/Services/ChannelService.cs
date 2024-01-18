@@ -113,6 +113,13 @@ public class ChannelService : IChannelService
         return channel;
     }
 
+    public ICollection<Channel> GetAllChannelsOfServer(string serverId)
+    {
+        var server = _serverService.GetServerById(serverId);
+
+        return server.Channels;
+    }
+
     public void CheckIfChannelIsPartOfServer(string serverId, string channelId)
     {
         Server server = _serverService.GetServerById(serverId);

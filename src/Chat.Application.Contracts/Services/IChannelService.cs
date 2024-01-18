@@ -13,5 +13,6 @@ public interface IChannelService
     );
     public void Delete(string serverId, string channelId);
     public Channel GetChannelById(string serverId, string channelId);
+    public ICollection<Channel> GetAllChannelsOfServer(string serverId);
     public void CheckIfChannelIsPartOfServer(string serverId, string channelId);
 }

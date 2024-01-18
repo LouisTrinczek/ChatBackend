@@ -128,6 +128,19 @@ public class ServerService : IServerService
         }
     }
 
+    public ICollection<Server> GetAllServersUserIsMemberOf(string userId)
+    {
+        var user = _userService.GetUserById(userId);
+        ICollection<Server> servers = new List<Server>();
+        
+        foreach (var userServer in user.UserServers)
+        {
+           servers.Add(userServer.Server); 
+        }
+
+        return servers;
+    }
+
     public void CheckIfAuthenticatedUserIsOwner(Server server)
     {
         var authenticatedUserId = _userService.GetAuthenticatedUserId();

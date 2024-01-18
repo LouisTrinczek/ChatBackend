@@ -40,7 +40,7 @@
             <response code='401'>If the user isn't logged in</response>
             <response code='403'>If the user tries to get a Channel he's not permitted to</response>
         </member>
-        <member name="M:Chat.API.Controllers.ChannelsController.GetAllServerChannels">
+        <member name="M:Chat.API.Controllers.ChannelsController.GetAllServerChannels(System.String)">
             <summary>Gets all Channels within the server</summary>
             <response code='200'>Successfully Get all channels a user sees</response>
             <response code='401'>If the user isn't logged in</response>
@@ -135,7 +135,7 @@
             Provides the REST Endpoints for the User Endpoints such as Login, Registering and user editing
             </summary>
         </member>
-        <member name="M:Chat.API.Controllers.UsersController.#ctor(Chat.Application.Contracts.Services.IUserService,Microsoft.Extensions.Logging.ILogger{Chat.API.Controllers.UsersController})">
+        <member name="M:Chat.API.Controllers.UsersController.#ctor(Chat.Application.Contracts.Services.IUserService,Microsoft.Extensions.Logging.ILogger{Chat.API.Controllers.UsersController},Chat.Application.Contracts.Services.IServerService)">
             <summary>
             Dependency Injection
             </summary>
@@ -195,7 +195,7 @@
             <response code='401'>If the user isn't logged in</response>
             <response code='403'>If the user tries to get a chat he's not permitted to</response>
         </member>
-        <member name="M:Chat.API.Controllers.UsersController.GetAllUserServers">
+        <member name="M:Chat.API.Controllers.UsersController.GetAllUserServers(System.String)">
             <summary>Gets all Servers a User is a member of</summary>
             <response code='200'>Successfully get servers</response>
             <response code='401'>If the user isn't logged in</response>

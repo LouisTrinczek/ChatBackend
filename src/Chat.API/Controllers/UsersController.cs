@@ -2,6 +2,7 @@
 using System.Net.Mime;
 using Chat.Application.Contracts.Services;
 using Chat.Application.Exceptions;
+using Chat.Application.Mappers;
 using Chat.Common.Dtos;
 using Chat.Common.Types;
 using Microsoft.AspNetCore.Authorization;
@@ -21,13 +22,15 @@ namespace Chat.API.Controllers;
 public class UsersController : ControllerBase
 {
     private readonly IUserService _userService;
+    private readonly IServerService _serverService;
     private readonly ILogger<UsersController> _logger;
 
     /// <summary>
     /// Dependency Injection
     /// </summary>
-    public UsersController(IUserService userService, ILogger<UsersController> logger)
+    public UsersController(IUserService userService, ILogger<UsersController> logger, IServerService serverService)
     {
+        _serverService = serverService;
         _userService = userService;
         _logger = logger;
     }
@@ -367,8 +370,39 @@ public class UsersController : ControllerBase
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [Produces(typeof(PaginatedApiResponse<MessageResponseDto[]>))]
     [Authorize]
-    public string GetAllUserServers()
+    public IActionResult GetAllUserServers([FromRoute] string userId)
     {
-        return "String";
+        try
+        {
+            var servers = _serverService.GetAllServersUserIsMemberOf(userId);
+            var serverResponseDtoList = new ServerMapper().ServerCollectionToServerResponseDtoList(servers);
+            return Ok(new ApiResponse<ServerResponseDto[]>(ResponseStatus.Success, serverResponseDtoList, new string[] { }));
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e.ToString());
+            ObjectResult exception = e switch
+            {
+                BadRequestException
+                or InvalidDataException
+                    => BadRequest(
+                        new ApiResponse<object>(
+                            ResponseStatus.Error,
+                            null,
+                            new string[] { e.Message }
+                        )
+                    ),
+                _
+                    => BadRequest(
+                        new ApiResponse<object>(
+                            ResponseStatus.Error,
+                            null,
+                            new string[] { "UnknownError" }
+                        )
+                    ),
+            };
+
+            return exception;
+        }
     }
 }

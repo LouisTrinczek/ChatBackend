@@ -10,5 +10,6 @@ public interface IServerService
 
     public Server GetServerById(string serverId);
     public void Delete(string serverId);
+    public ICollection<Server> GetAllServersUserIsMemberOf(string userId);
     public void CheckIfAuthenticatedUserIsOwner(Server server);
 }

@@ -11,6 +11,7 @@ public partial class ServerMapper
 
     [MapProperty(nameof(Server.UserServers), nameof(ServerResponseDto.Members))]
     public partial ServerResponseDto ServerToServerResponseDto(Server server);
+    public partial ServerResponseDto[] ServerCollectionToServerResponseDtoList(ICollection<Server> server);
 
     public partial Server ServerCreationDtoToServer(ServerCreationDto serverCreationDto);
 

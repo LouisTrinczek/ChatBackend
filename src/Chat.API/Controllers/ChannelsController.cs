@@ -293,9 +293,53 @@ public class ChannelsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [Produces(typeof(ApiResponse<ServerChannelResponseDto[]>))]
     [Authorize]
-    public string GetAllServerChannels()
+    public IActionResult GetAllServerChannels([FromRoute] string serverId)
     {
-        return "String";
+        try
+        {
+            var channel = _channelService.GetAllChannelsOfServer(serverId);
+            var channelResponseDto = _channelMapper.ServerChannelCollectionToChannelResponseDtoList(channel);
+            return Ok(
+                new ApiResponse<ServerChannelResponseDto[]>(
+                    ResponseStatus.Success,
+                    channelResponseDto,
+                    new string[] { }
+                )
+            );
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e.ToString());
+            ObjectResult exception = e switch
+            {
+                BadRequestException
+                    => BadRequest(
+                        new ApiResponse<object>(
+                            ResponseStatus.Error,
+                            null,
+                            new string[] { e.Message }
+                        )
+                    ),
+                ForbiddenException
+                    => new Forbidden(
+                        new ApiResponse<object>(
+                            ResponseStatus.Error,
+                            null,
+                            new string[] { e.Message }
+                        )
+                    ),
+                _
+                    => BadRequest(
+                        new ApiResponse<object>(
+                            ResponseStatus.Error,
+                            null,
+                            new string[] { "UnknownError" }
+                        )
+                    ),
+            };
+
+            return exception;
+        }
     }
 
     /// <summary>Writes a Message to a Channel</summary>
