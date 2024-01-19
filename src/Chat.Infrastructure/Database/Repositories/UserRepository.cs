@@ -9,10 +9,15 @@ public class UserRepository : GenericRepository<User>, IUserRepository
     public UserRepository(ChatDataContext chatDataContext)
         : base(chatDataContext) { }
 
-    public User? GetById(string userId)
+    public new User? GetById(string userId)
     {
-        return _context.Users.Include(u => u.UserServers).ThenInclude(u => u.Server).FirstOrDefault();
+        return _context
+            .Users.Where(u => u.Id == userId)
+            .Include(u => u.UserServers)
+            .ThenInclude(u => u.Server)
+            .FirstOrDefault();
     }
+
     public User? GetByUsername(string username)
     {
         return _context.Users.FirstOrDefault(w => w.Username == username);

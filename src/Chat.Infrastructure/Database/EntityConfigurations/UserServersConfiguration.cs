@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Chat.Infrastructure.Database.EntityConfigurations;
 
-public class UserServerConfiguration : IEntityTypeConfiguration<UserServer>
+public class UserServersConfiguration : IEntityTypeConfiguration<UserServers>
 {
-    public void Configure(EntityTypeBuilder<UserServer> builder)
+    public void Configure(EntityTypeBuilder<UserServers> builder)
     {
         builder.HasKey(us => new { us.UserId, us.ServerId });
 

@@ -13,7 +13,8 @@ public class ChannelRepository : GenericRepository<Channel>, IChannelRepository
     public new Channel? GetById(string channelId)
     {
         return _context
-            .Channel.Include(c => c.Server)
+            .Channel.Where(c => c.Id == channelId)
+            .Include(c => c.Server)
             .ThenInclude(c => c.Owner)
             .FirstOrDefault(c => c.Id == channelId);
     }

@@ -9,7 +9,7 @@
             Provides the REST Endpoints for the Server Channels like Creation, Deletion and Updating
             </summary>
         </member>
-        <member name="M:Chat.API.Controllers.ChannelsController.#ctor(Chat.Infrastructure.Database.ChatDataContext,Chat.Application.Contracts.Services.IChannelService,Microsoft.Extensions.Logging.ILogger{Chat.API.Controllers.ChannelsController})">
+        <member name="M:Chat.API.Controllers.ChannelsController.#ctor(Chat.Infrastructure.Database.ChatDataContext,Chat.Application.Contracts.Services.IChannelService,Chat.Application.Contracts.Services.IMessageService,Microsoft.Extensions.Logging.ILogger{Chat.API.Controllers.ChannelsController})">
             <summary>
             Dependency Injection
             </summary>
@@ -46,25 +46,25 @@
             <response code='401'>If the user isn't logged in</response>
             <response code='403'>If the user tries to get a Servers Channels he's not permitted to</response>
         </member>
-        <member name="M:Chat.API.Controllers.ChannelsController.WriteMessage(Chat.Common.Dtos.MessageCreateDto)">
+        <member name="M:Chat.API.Controllers.ChannelsController.WriteMessage(Chat.Common.Dtos.MessageCreateDto,System.String,System.String)">
             <summary>Writes a Message to a Channel</summary>
             <response code='200'>Successfully sent message</response>
             <response code='401'>If the user isn't logged in</response>
             <response code='403'>If the user tries to write in a channel he's not permitted to</response>
         </member>
-        <member name="M:Chat.API.Controllers.ChannelsController.UpdateMessage(Chat.Common.Dtos.MessageUpdateDto)">
+        <member name="M:Chat.API.Controllers.ChannelsController.UpdateMessage(Chat.Common.Dtos.MessageUpdateDto,System.String,System.String,System.String)">
             <summary>Updates a Message</summary>
             <response code='200'>Successfully updated message</response>
             <response code='401'>If the user isn't logged in</response>
             <response code='403'>If the user tries to update a message he's not permitted to</response>
         </member>
-        <member name="M:Chat.API.Controllers.ChannelsController.DeleteMessage">
+        <member name="M:Chat.API.Controllers.ChannelsController.DeleteMessage(System.String,System.String,System.String)">
             <summary>Deletes A Message</summary>
             <response code='200'>Successfully deleted message</response>
             <response code='401'>If the user isn't logged in</response>
             <response code='403'>If the user tries to delete a message he's not permitted to</response>
         </member>
-        <member name="M:Chat.API.Controllers.ChannelsController.GetMessages">
+        <member name="M:Chat.API.Controllers.ChannelsController.GetMessages(System.String,System.String)">
             <summary>Gets a Paginated Chat from a channel</summary>
             <response code='200'>Successfully get chat</response>
             <response code='401'>If the user isn't logged in</response>
@@ -135,7 +135,7 @@
             Provides the REST Endpoints for the User Endpoints such as Login, Registering and user editing
             </summary>
         </member>
-        <member name="M:Chat.API.Controllers.UsersController.#ctor(Chat.Application.Contracts.Services.IUserService,Microsoft.Extensions.Logging.ILogger{Chat.API.Controllers.UsersController},Chat.Application.Contracts.Services.IServerService)">
+        <member name="M:Chat.API.Controllers.UsersController.#ctor(Chat.Application.Contracts.Services.IUserService,Microsoft.Extensions.Logging.ILogger{Chat.API.Controllers.UsersController},Chat.Application.Contracts.Services.IServerService,Chat.Application.Contracts.Services.IMessageService)">
             <summary>
             Dependency Injection
             </summary>
@@ -171,25 +171,25 @@
             <response code='401'>If the user isn't logged in</response>
             <response code='403'>If the user tries to get a user he's not permitted to</response>
         </member>
-        <member name="M:Chat.API.Controllers.UsersController.WriteMessage(Chat.Common.Dtos.MessageCreateDto)">
+        <member name="M:Chat.API.Controllers.UsersController.WriteMessage(Chat.Common.Dtos.MessageCreateDto,System.String)">
             <summary>Writes a Message to a User</summary>
             <response code='200'>Successfully sent message</response>
             <response code='401'>If the user isn't logged in</response>
             <response code='403'>If the user tries to write a user he's not permitted to</response>
         </member>
-        <member name="M:Chat.API.Controllers.UsersController.UpdateMessage(Chat.Common.Dtos.MessageUpdateDto)">
+        <member name="M:Chat.API.Controllers.UsersController.UpdateMessage(Chat.Common.Dtos.MessageUpdateDto,System.String,System.String)">
             <summary>Updates a Message</summary>
             <response code='200'>Successfully updated message</response>
             <response code='401'>If the user isn't logged in</response>
             <response code='403'>If the user tries to update a message he's not permitted to</response>
         </member>
-        <member name="M:Chat.API.Controllers.UsersController.DeleteMessage">
+        <member name="M:Chat.API.Controllers.UsersController.DeleteMessage(System.String,System.String)">
             <summary>Deletes A Message</summary>
             <response code='200'>Successfully deleted message</response>
             <response code='401'>If the user isn't logged in</response>
             <response code='403'>If the user tries to delete a message he's not permitted to</response>
         </member>
-        <member name="M:Chat.API.Controllers.UsersController.GetMessages">
+        <member name="M:Chat.API.Controllers.UsersController.GetMessages(System.String)">
             <summary>Gets a Paginated Chat with a user</summary>
             <response code='200'>Successfully get chat</response>
             <response code='401'>If the user isn't logged in</response>

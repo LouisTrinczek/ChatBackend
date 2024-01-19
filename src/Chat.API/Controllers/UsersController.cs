@@ -24,8 +24,10 @@ public class UsersController : ControllerBase
 {
     private readonly IUserService _userService;
     private readonly IServerService _serverService;
+    private readonly IMessageService _messageService;
     private readonly ILogger<UsersController> _logger;
     private readonly UserMapper _userMapper = new UserMapper();
+    private readonly MessageMapper _messageMapper = new MessageMapper();
 
     /// <summary>
     /// Dependency Injection
@@ -33,12 +35,14 @@ public class UsersController : ControllerBase
     public UsersController(
         IUserService userService,
         ILogger<UsersController> logger,
-        IServerService serverService
+        IServerService serverService,
+        IMessageService messageService
     )
     {
         _serverService = serverService;
         _userService = userService;
         _logger = logger;
+        _messageService = messageService;
     }
 
     /// <summary>Creates a new User</summary>
@@ -266,10 +270,7 @@ public class UsersController : ControllerBase
                             null,
                             new string[] { e.Message }
                         )
-                    )
-                    {
-                        StatusCode = StatusCodes.Status403Forbidden
-                    },
+                    ),
                 _
                     => new InternalServerError(
                         new ApiResponse<object>(
@@ -329,10 +330,7 @@ public class UsersController : ControllerBase
                             null,
                             new string[] { e.Message }
                         )
-                    )
-                    {
-                        StatusCode = StatusCodes.Status403Forbidden
-                    },
+                    ),
                 _
                     => new InternalServerError(
                         new ApiResponse<object>(
@@ -359,9 +357,59 @@ public class UsersController : ControllerBase
     [Produces(typeof(ApiResponse<MessageResponseDto>))]
     [Consumes(typeof(MessageCreateDto), MediaTypeNames.Application.Json)]
     [Authorize]
-    public string WriteMessage([FromBody] MessageCreateDto messageCreateDto)
+    public IActionResult WriteMessage(
+        [FromBody] MessageCreateDto messageCreateDto,
+        [FromRoute] string userId
+    )
     {
-        return "String";
+        try
+        {
+            Message message = _messageService.WriteMessageToUser(messageCreateDto, userId);
+            MessageResponseDto messageResponseDto = _messageMapper.MessageToMessageResponseDto(
+                message
+            );
+
+            return Ok(
+                new ApiResponse<MessageResponseDto>(
+                    ResponseStatus.Success,
+                    messageResponseDto,
+                    new string[] { }
+                )
+            );
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e.ToString());
+            ObjectResult exception = e switch
+            {
+                CustomException
+                    => BadRequest(
+                        new ApiResponse<object>(
+                            ResponseStatus.Error,
+                            null,
+                            new string[] { e.Message }
+                        )
+                    ),
+                ForbiddenException
+                    => new Forbidden(
+                        new ApiResponse<object>(
+                            ResponseStatus.Error,
+                            null,
+                            new string[] { e.Message }
+                        )
+                    ),
+                _
+                    => new InternalServerError(
+                        new ApiResponse<object>(
+                            ResponseStatus.Error,
+                            null,
+                            new string[] { "UnknownError" }
+                        )
+                    )
+            };
+
+            return exception;
+        }
     }
 
     /// <summary>Updates a Message</summary>
@@ -376,9 +424,65 @@ public class UsersController : ControllerBase
     [Produces(typeof(ApiResponse<MessageResponseDto>))]
     [Consumes(typeof(MessageUpdateDto), MediaTypeNames.Application.Json)]
     [Authorize]
-    public string UpdateMessage([FromBody] MessageUpdateDto messageUpdateDto)
+    public IActionResult UpdateMessage(
+        [FromBody] MessageUpdateDto messageUpdateDto,
+        [FromRoute] string userId,
+        [FromRoute] string messageId
+    )
     {
-        return "String";
+        try
+        {
+            Message message = _messageService.UpdateUserMessage(
+                messageUpdateDto,
+                userId,
+                messageId
+            );
+
+            MessageResponseDto messageResponseDto = _messageMapper.MessageToMessageResponseDto(
+                message
+            );
+
+            return Ok(
+                new ApiResponse<MessageResponseDto>(
+                    ResponseStatus.Success,
+                    messageResponseDto,
+                    new string[] { }
+                )
+            );
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e.ToString());
+            ObjectResult exception = e switch
+            {
+                BadRequestException
+                    => BadRequest(
+                        new ApiResponse<object>(
+                            ResponseStatus.Error,
+                            null,
+                            new string[] { e.Message }
+                        )
+                    ),
+                ForbiddenException
+                    => new Forbidden(
+                        new ApiResponse<object>(
+                            ResponseStatus.Error,
+                            null,
+                            new string[] { e.Message }
+                        )
+                    ),
+                _
+                    => new InternalServerError(
+                        new ApiResponse<object>(
+                            ResponseStatus.Error,
+                            null,
+                            new string[] { "UnknownError" }
+                        )
+                    )
+            };
+
+            return exception;
+        }
     }
 
     /// <summary>Deletes A Message</summary>
@@ -392,9 +496,48 @@ public class UsersController : ControllerBase
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [Produces(typeof(ApiResponse<string>))]
     [Authorize]
-    public string DeleteMessage()
+    public IActionResult DeleteMessage([FromRoute] string userId, [FromRoute] string messageId)
     {
-        return "String";
+        try
+        {
+            _messageService.DeleteUserMessage(userId, messageId);
+            return Ok(
+                new ApiResponse<MessageResponseDto>(ResponseStatus.Success, null, new string[] { })
+            );
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e.ToString());
+            ObjectResult exception = e switch
+            {
+                BadRequestException
+                    => BadRequest(
+                        new ApiResponse<object>(
+                            ResponseStatus.Error,
+                            null,
+                            new string[] { e.Message }
+                        )
+                    ),
+                ForbiddenException
+                    => new Forbidden(
+                        new ApiResponse<object>(
+                            ResponseStatus.Error,
+                            null,
+                            new string[] { e.Message }
+                        )
+                    ),
+                _
+                    => new InternalServerError(
+                        new ApiResponse<object>(
+                            ResponseStatus.Error,
+                            null,
+                            new string[] { "UnknownError" }
+                        )
+                    )
+            };
+
+            return exception;
+        }
     }
 
     /// <summary>Gets a Paginated Chat with a user</summary>
@@ -408,9 +551,55 @@ public class UsersController : ControllerBase
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [Produces(typeof(PaginatedApiResponse<MessageResponseDto[]>))]
     [Authorize]
-    public string GetMessages()
+    public IActionResult GetMessages([FromRoute] string userId)
     {
-        return "String";
+        try
+        {
+            ICollection<Message> messages = _messageService.GetUserMessages(userId);
+            var messageResponseDtos = _messageMapper.MessageCollectionToMessageResponseDtoArray(
+                messages
+            );
+            return Ok(
+                new ApiResponse<MessageResponseDto[]>(
+                    ResponseStatus.Success,
+                    messageResponseDtos,
+                    new string[] { }
+                )
+            );
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e.ToString());
+            ObjectResult exception = e switch
+            {
+                BadRequestException
+                    => BadRequest(
+                        new ApiResponse<object>(
+                            ResponseStatus.Error,
+                            null,
+                            new string[] { e.Message }
+                        )
+                    ),
+                ForbiddenException
+                    => new Forbidden(
+                        new ApiResponse<object>(
+                            ResponseStatus.Error,
+                            null,
+                            new string[] { e.Message }
+                        )
+                    ),
+                _
+                    => new InternalServerError(
+                        new ApiResponse<object>(
+                            ResponseStatus.Error,
+                            null,
+                            new string[] { "UnknownError" }
+                        )
+                    )
+            };
+
+            return exception;
+        }
     }
 
     /// <summary>Gets all Servers a User is a member of</summary>

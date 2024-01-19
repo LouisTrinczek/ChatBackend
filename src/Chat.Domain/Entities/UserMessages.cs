@@ -1,6 +1,6 @@
 ﻿namespace Chat.Domain.Entities;
 
-public class UserMessage : BaseEntity
+public class UserMessages : BaseEntity
 {
     public string ReceiverId { get; set; } = null!;
     public string MessageId { get; set; } = null!;

@@ -13,7 +13,9 @@ public class ChatDataContext : DbContext
     public DbSet<Channel> Channel { get; set; } = null!;
     public DbSet<Message> Message { get; set; } = null!;
     public DbSet<Friends> Friends { get; set; } = null!;
-    public DbSet<UserServer> UserServers { get; set; } = null!;
+    public DbSet<UserServers> UserServers { get; set; } = null!;
+    public DbSet<UserMessages> UserMessages { get; set; } = null!;
+    public DbSet<ChannelMessage> ChannelMessages { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

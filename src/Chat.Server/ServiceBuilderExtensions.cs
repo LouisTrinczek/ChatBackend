@@ -81,6 +81,8 @@ public static class ServiceBuilderExtensions
     {
         self.Services.AddScoped<IUserService, UserService>();
         self.Services.AddScoped<IUserRepository, UserRepository>();
+        self.Services.AddScoped<IMessageService, MessageService>();
+        self.Services.AddScoped<IMessageRepository, MessageRepository>();
         self.Services.AddScoped<IServerService, ServerService>();
         self.Services.AddScoped<IServerRepository, ServerRepository>();
         self.Services.AddScoped<IChannelService, ChannelService>();

@@ -9,5 +9,5 @@ public class Channel : BaseEntity
 
     public string ServerId { get; set; }
     public Server Server { get; set; } = null!;
-    public ICollection<Message> Messages = new List<Message>();
+    public ICollection<ChannelMessage> ChannelMessages { get; set; } = new List<ChannelMessage>();
 }

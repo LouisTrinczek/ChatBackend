@@ -208,6 +208,7 @@ public class UserService : IUserService
     {
         var user = _userRepository.GetById(userId);
 
+        Console.WriteLine(user == null);
         if (user == null || user.DeletedAt is not null)
         {
             throw new BadRequestException("UserDoesNotExist");

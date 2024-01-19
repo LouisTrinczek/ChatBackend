@@ -15,5 +15,5 @@ public class Server : BaseEntity
 
     public User Owner { get; set; } = null!;
     public ICollection<Channel> Channels { get; set; } = new List<Channel>();
-    public ICollection<UserServer> UserServers { get; set; } = new List<UserServer>();
+    public ICollection<UserServers> UserServers { get; set; } = new List<UserServers>();
 }

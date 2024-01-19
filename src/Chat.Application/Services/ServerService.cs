@@ -45,7 +45,7 @@ public class ServerService : IServerService
             serverToCreate.Owner = owner;
             serverToCreate.Channels.Add(new Channel() { Name = "chat" });
             serverToCreate.UserServers.Add(
-                new UserServer() { Server = serverToCreate, User = owner }
+                new UserServers() { Server = serverToCreate, User = owner }
             );
 
             _serverRepository.Insert(serverToCreate);
@@ -132,10 +132,10 @@ public class ServerService : IServerService
     {
         var user = _userService.GetUserById(userId);
         ICollection<Server> servers = new List<Server>();
-        
+
         foreach (var userServer in user.UserServers)
         {
-           servers.Add(userServer.Server); 
+            servers.Add(userServer.Server);
         }
 
         return servers;

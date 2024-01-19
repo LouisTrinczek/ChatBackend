@@ -3,16 +3,19 @@ using System;
 using Chat.Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace Chat.Infrastructure.Migrations
+namespace Chat.Infrastructure.Database.Migrations
 {
     [DbContext(typeof(ChatDataContext))]
-    partial class ChatDataContextModelSnapshot : ModelSnapshot
+    [Migration("20240119183415_ChannelAndUserMessages")]
+    partial class ChannelAndUserMessages
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -76,7 +79,7 @@ namespace Chat.Infrastructure.Migrations
 
                     b.HasIndex("MessageId");
 
-                    b.ToTable("ChannelMessages");
+                    b.ToTable("ChannelMessage");
                 });
 
             modelBuilder.Entity("Chat.Domain.Entities.Friends", b =>
@@ -115,10 +118,6 @@ namespace Chat.Infrastructure.Migrations
 
                     b.Property<string>("AuthorId")
                         .HasColumnType("varchar(255)");
-
-                    b.Property<string>("Content")
-                        .IsRequired()
-                        .HasColumnType("longtext");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime(6)");
@@ -212,9 +211,12 @@ namespace Chat.Infrastructure.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("Chat.Domain.Entities.UserMessages", b =>
+            modelBuilder.Entity("Chat.Domain.Entities.UserMessage", b =>
                 {
                     b.Property<string>("Id")
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<string>("ChannelId")
                         .HasColumnType("varchar(255)");
 
                     b.Property<DateTime>("CreatedAt")
@@ -236,14 +238,16 @@ namespace Chat.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ChannelId");
+
                     b.HasIndex("MessageId");
 
                     b.HasIndex("ReceiverId");
 
-                    b.ToTable("UserMessages");
+                    b.ToTable("UserMessage");
                 });
 
-            modelBuilder.Entity("Chat.Domain.Entities.UserServers", b =>
+            modelBuilder.Entity("Chat.Domain.Entities.UserServer", b =>
                 {
                     b.Property<string>("UserId")
                         .HasColumnType("varchar(255)");
@@ -333,8 +337,12 @@ namespace Chat.Infrastructure.Migrations
                     b.Navigation("Owner");
                 });
 
-            modelBuilder.Entity("Chat.Domain.Entities.UserMessages", b =>
+            modelBuilder.Entity("Chat.Domain.Entities.UserMessage", b =>
                 {
+                    b.HasOne("Chat.Domain.Entities.Channel", null)
+                        .WithMany("UserMessages")
+                        .HasForeignKey("ChannelId");
+
                     b.HasOne("Chat.Domain.Entities.Message", "Message")
                         .WithMany("UserMessages")
                         .HasForeignKey("MessageId")
@@ -352,7 +360,7 @@ namespace Chat.Infrastructure.Migrations
                     b.Navigation("Receiver");
                 });
 
-            modelBuilder.Entity("Chat.Domain.Entities.UserServers", b =>
+            modelBuilder.Entity("Chat.Domain.Entities.UserServer", b =>
                 {
                     b.HasOne("Chat.Domain.Entities.Server", "Server")
                         .WithMany("UserServers")
@@ -374,6 +382,8 @@ namespace Chat.Infrastructure.Migrations
             modelBuilder.Entity("Chat.Domain.Entities.Channel", b =>
                 {
                     b.Navigation("ChannelMessages");
+
+                    b.Navigation("UserMessages");
                 });
 
             modelBuilder.Entity("Chat.Domain.Entities.Message", b =>

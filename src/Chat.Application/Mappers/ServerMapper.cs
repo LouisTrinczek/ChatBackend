@@ -18,7 +18,7 @@ public partial class ServerMapper
     public partial Server ServerUpdateDtoToServer(ServerUpdateDto serverUpdateDto);
 
     private ICollection<UserResponseDto> UsersToUserResponseDtos(
-        ICollection<UserServer> userServers
+        ICollection<UserServers> userServers
     )
     {
         return userServers

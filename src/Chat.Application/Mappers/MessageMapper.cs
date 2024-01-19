@@ -9,6 +9,10 @@ public partial class MessageMapper
 {
     public partial MessageResponseDto MessageToMessageResponseDto(Message message);
 
+    public partial MessageResponseDto[] MessageCollectionToMessageResponseDtoArray(
+        ICollection<Message> message
+    );
+
     public partial Message MessageCreateDtoToMessage(MessageCreateDto messageCreateDto);
 
     public partial Message MessageUpdateDtoToMessage(MessageUpdateDto messageUpdateDto);

@@ -27,7 +27,9 @@ public class ChannelsController : ControllerBase
 {
     private readonly IGenericRepository<Channel> _genericRepository;
     private readonly IChannelService _channelService;
+    private readonly IMessageService _messageService;
     private readonly ChannelMapper _channelMapper = new ChannelMapper();
+    private readonly MessageMapper _messageMapper = new MessageMapper();
     private readonly ILogger<ChannelsController> _logger;
 
     /// <summary>
@@ -36,11 +38,13 @@ public class ChannelsController : ControllerBase
     public ChannelsController(
         ChatDataContext chatDataContext,
         IChannelService channelService,
+        IMessageService messageService,
         ILogger<ChannelsController> logger
     )
     {
         _genericRepository = new GenericRepository<Channel>(chatDataContext);
         _channelService = channelService;
+        _messageService = messageService;
         _logger = logger;
     }
 
@@ -298,7 +302,9 @@ public class ChannelsController : ControllerBase
         try
         {
             var channel = _channelService.GetAllChannelsOfServer(serverId);
-            var channelResponseDto = _channelMapper.ServerChannelCollectionToChannelResponseDtoList(channel);
+            var channelResponseDto = _channelMapper.ServerChannelCollectionToChannelResponseDtoList(
+                channel
+            );
             return Ok(
                 new ApiResponse<ServerChannelResponseDto[]>(
                     ResponseStatus.Success,
@@ -354,9 +360,68 @@ public class ChannelsController : ControllerBase
     [Produces(typeof(ApiResponse<MessageResponseDto>))]
     [Consumes(typeof(MessageCreateDto), MediaTypeNames.Application.Json)]
     [Authorize]
-    public string WriteMessage([FromBody] MessageCreateDto messageCreateDto)
+    public IActionResult WriteMessage(
+        [FromBody] MessageCreateDto messageCreateDto,
+        [FromRoute] string serverId,
+        [FromRoute] string channelId
+    )
     {
-        return "String";
+        try
+        {
+            Message message = _messageService.WriteMessageToChannel(
+                messageCreateDto,
+                serverId,
+                channelId
+            );
+
+            MessageResponseDto messageResponseDto = _messageMapper.MessageToMessageResponseDto(
+                message
+            );
+
+            return Ok(
+                new ApiResponse<MessageResponseDto>(
+                    ResponseStatus.Success,
+                    messageResponseDto,
+                    new string[] { }
+                )
+            );
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e.ToString());
+            ObjectResult exception = e switch
+            {
+                CustomException
+                    => BadRequest(
+                        new ApiResponse<object>(
+                            ResponseStatus.Error,
+                            null,
+                            new string[] { e.Message }
+                        )
+                    ),
+                ForbiddenException
+                    => new Forbidden(
+                        new ApiResponse<object>(
+                            ResponseStatus.Error,
+                            null,
+                            new string[] { e.Message }
+                        )
+                    )
+                    {
+                        StatusCode = StatusCodes.Status403Forbidden
+                    },
+                _
+                    => new InternalServerError(
+                        new ApiResponse<object>(
+                            ResponseStatus.Error,
+                            null,
+                            new string[] { "UnknownError" }
+                        )
+                    )
+            };
+
+            return exception;
+        }
     }
 
     /// <summary>Updates a Message</summary>
@@ -371,9 +436,70 @@ public class ChannelsController : ControllerBase
     [Produces(typeof(ApiResponse<MessageResponseDto>))]
     [Consumes(typeof(MessageUpdateDto), MediaTypeNames.Application.Json)]
     [Authorize]
-    public string UpdateMessage([FromBody] MessageUpdateDto messageUpdateDto)
+    public IActionResult UpdateMessage(
+        [FromBody] MessageUpdateDto messageUpdateDto,
+        [FromRoute] string serverId,
+        [FromRoute] string channelId,
+        [FromRoute] string messageId
+    )
     {
-        return "String";
+        try
+        {
+            Message message = _messageService.UpdateChannelMessage(
+                messageUpdateDto,
+                serverId,
+                channelId,
+                messageId
+            );
+
+            MessageResponseDto messageResponseDto = _messageMapper.MessageToMessageResponseDto(
+                message
+            );
+
+            return Ok(
+                new ApiResponse<MessageResponseDto>(
+                    ResponseStatus.Success,
+                    messageResponseDto,
+                    new string[] { }
+                )
+            );
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e.ToString());
+            ObjectResult exception = e switch
+            {
+                CustomException
+                    => BadRequest(
+                        new ApiResponse<object>(
+                            ResponseStatus.Error,
+                            null,
+                            new string[] { e.Message }
+                        )
+                    ),
+                ForbiddenException
+                    => new Forbidden(
+                        new ApiResponse<object>(
+                            ResponseStatus.Error,
+                            null,
+                            new string[] { e.Message }
+                        )
+                    )
+                    {
+                        StatusCode = StatusCodes.Status403Forbidden
+                    },
+                _
+                    => new InternalServerError(
+                        new ApiResponse<object>(
+                            ResponseStatus.Error,
+                            null,
+                            new string[] { "UnknownError" }
+                        )
+                    )
+            };
+
+            return exception;
+        }
     }
 
     /// <summary>Deletes A Message</summary>
@@ -387,9 +513,54 @@ public class ChannelsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [Produces(typeof(ApiResponse<string>))]
     [Authorize]
-    public string DeleteMessage()
+    public IActionResult DeleteMessage(
+        [FromRoute] string serverId,
+        [FromRoute] string channelId,
+        [FromRoute] string messageId
+    )
     {
-        return "String";
+        try
+        {
+            _messageService.DeleteChannelMessage(serverId, channelId, messageId);
+
+            return Ok(new ApiResponse<object>(ResponseStatus.Success, null, new string[] { }));
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e.ToString());
+            ObjectResult exception = e switch
+            {
+                CustomException
+                    => BadRequest(
+                        new ApiResponse<object>(
+                            ResponseStatus.Error,
+                            null,
+                            new string[] { e.Message }
+                        )
+                    ),
+                ForbiddenException
+                    => new Forbidden(
+                        new ApiResponse<object>(
+                            ResponseStatus.Error,
+                            null,
+                            new string[] { e.Message }
+                        )
+                    )
+                    {
+                        StatusCode = StatusCodes.Status403Forbidden
+                    },
+                _
+                    => new InternalServerError(
+                        new ApiResponse<object>(
+                            ResponseStatus.Error,
+                            null,
+                            new string[] { "UnknownError" }
+                        )
+                    )
+            };
+
+            return exception;
+        }
     }
 
     /// <summary>Gets a Paginated Chat from a channel</summary>
@@ -403,8 +574,54 @@ public class ChannelsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [Produces(typeof(PaginatedApiResponse<MessageResponseDto[]>))]
     [Authorize]
-    public string GetMessages()
+    public IActionResult GetMessages([FromRoute] string serverId, [FromRoute] string channelId)
     {
-        return "String";
+        try
+        {
+            ICollection<Message> messages = _messageService.GetChannelMessages(serverId, channelId);
+            var messageResponseDtos = _messageMapper.MessageCollectionToMessageResponseDtoArray(
+                messages
+            );
+            return Ok(
+                new ApiResponse<MessageResponseDto[]>(
+                    ResponseStatus.Success,
+                    messageResponseDtos,
+                    new string[] { }
+                )
+            );
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e.ToString());
+            ObjectResult exception = e switch
+            {
+                BadRequestException
+                    => BadRequest(
+                        new ApiResponse<object>(
+                            ResponseStatus.Error,
+                            null,
+                            new string[] { e.Message }
+                        )
+                    ),
+                ForbiddenException
+                    => new Forbidden(
+                        new ApiResponse<object>(
+                            ResponseStatus.Error,
+                            null,
+                            new string[] { e.Message }
+                        )
+                    ),
+                _
+                    => new InternalServerError(
+                        new ApiResponse<object>(
+                            ResponseStatus.Error,
+                            null,
+                            new string[] { "UnknownError" }
+                        )
+                    )
+            };
+
+            return exception;
+        }
     }
 }

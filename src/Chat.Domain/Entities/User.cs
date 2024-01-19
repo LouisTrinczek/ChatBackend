@@ -28,7 +28,8 @@ public class User : BaseEntity
     [MaxLength(100)]
     public string? AvatarUrl { get; set; } = null!;
 
-    public ICollection<UserServer> UserServers { get; } = new List<UserServer>();
+    public ICollection<UserServers> UserServers { get; set; } = new List<UserServers>();
+    public ICollection<UserMessages> UserMessages { get; set; } = new List<UserMessages>();
 
     public bool EmailIsValid()
     {

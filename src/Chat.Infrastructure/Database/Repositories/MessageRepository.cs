@@ -5,16 +5,34 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Chat.Infrastructure.Database.Repositories;
 
-public class ChannelRepository : GenericRepository<Channel>, IChannelRepository
+public class MessageRepository : GenericRepository<Message>, IMessageRepository
 {
-    public ChannelRepository(ChatDataContext chatDataContext)
+    public MessageRepository(ChatDataContext chatDataContext)
         : base(chatDataContext) { }
 
-    public new Channel? GetById(string channelId)
+    public List<Message> GetUserMessages(string userId)
     {
-        return _context
-            .Channel.Include(c => c.Server)
-            .ThenInclude(c => c.Owner)
-            .FirstOrDefault(c => c.Id == channelId);
+        var messages = _context
+            .Users.Where(u => u.Id == userId)
+            .Include(u => u.UserMessages)
+            .ThenInclude(u => u.Message)
+            .SelectMany(u => u.UserMessages.Select(um => um.Message))
+            .Include(m => m.Author)
+            .ToList();
+
+        return messages;
+    }
+
+    public List<Message> GetChannelMessages(string channelId)
+    {
+        var messages = _context
+            .Channel.Where(c => c.Id == channelId)
+            .Include(u => u.ChannelMessages)
+            .ThenInclude(u => u.Message)
+            .SelectMany(u => u.ChannelMessages.Select(um => um.Message))
+            .Include(m => m.Author)
+            .ToList();
+
+        return messages;
     }
 }
