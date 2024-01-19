@@ -5,6 +5,7 @@ using Chat.Application.Exceptions;
 using Chat.Application.Mappers;
 using Chat.Common.Dtos;
 using Chat.Common.Types;
+using Chat.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -24,11 +25,16 @@ public class UsersController : ControllerBase
     private readonly IUserService _userService;
     private readonly IServerService _serverService;
     private readonly ILogger<UsersController> _logger;
+    private readonly UserMapper _userMapper = new UserMapper();
 
     /// <summary>
     /// Dependency Injection
     /// </summary>
-    public UsersController(IUserService userService, ILogger<UsersController> logger, IServerService serverService)
+    public UsersController(
+        IUserService userService,
+        ILogger<UsersController> logger,
+        IServerService serverService
+    )
     {
         _serverService = serverService;
         _userService = userService;
@@ -288,9 +294,57 @@ public class UsersController : ControllerBase
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [Produces(typeof(ApiResponse<UserResponseDto[]>))]
     [Authorize]
-    public string Get()
+    public IActionResult Get([FromRoute] string userId)
     {
-        return "String";
+        try
+        {
+            User user = _userService.GetUserById(userId);
+            UserResponseDto userResponseDto = _userMapper.UserToUserResponseDto(user);
+
+            return Ok(
+                new ApiResponse<UserResponseDto>(
+                    ResponseStatus.Success,
+                    userResponseDto,
+                    new string[] { }
+                )
+            );
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e.ToString());
+            ObjectResult exception = e switch
+            {
+                CustomException
+                    => BadRequest(
+                        new ApiResponse<object>(
+                            ResponseStatus.Error,
+                            null,
+                            new string[] { e.Message }
+                        )
+                    ),
+                ForbiddenException
+                    => new Forbidden(
+                        new ApiResponse<object>(
+                            ResponseStatus.Error,
+                            null,
+                            new string[] { e.Message }
+                        )
+                    )
+                    {
+                        StatusCode = StatusCodes.Status403Forbidden
+                    },
+                _
+                    => new InternalServerError(
+                        new ApiResponse<object>(
+                            ResponseStatus.Error,
+                            null,
+                            new string[] { "UnknownError" }
+                        )
+                    )
+            };
+
+            return exception;
+        }
     }
 
     /// <summary>Writes a Message to a User</summary>
@@ -375,8 +429,16 @@ public class UsersController : ControllerBase
         try
         {
             var servers = _serverService.GetAllServersUserIsMemberOf(userId);
-            var serverResponseDtoList = new ServerMapper().ServerCollectionToServerResponseDtoList(servers);
-            return Ok(new ApiResponse<ServerResponseDto[]>(ResponseStatus.Success, serverResponseDtoList, new string[] { }));
+            var serverResponseDtoList = new ServerMapper().ServerCollectionToServerResponseDtoList(
+                servers
+            );
+            return Ok(
+                new ApiResponse<ServerResponseDto[]>(
+                    ResponseStatus.Success,
+                    serverResponseDtoList,
+                    new string[] { }
+                )
+            );
         }
         catch (Exception e)
         {
