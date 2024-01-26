@@ -20,15 +20,10 @@ namespace Chat.API.Controllers;
 [Produces(MediaTypeNames.Application.Json)]
 public class FriendsController
 {
-    private IGenericRepository<Friends> _genericRepository;
-
     /// <summary>
     /// Dependency Injection
     /// </summary>
-    public FriendsController(ChatDataContext chatDataContext)
-    {
-        _genericRepository = new GenericRepository<Friends>(chatDataContext);
-    }
+    public FriendsController() { }
 
     /// <summary>Adds a Friend</summary>
     /// <response code='200'>Successfully Added Friend</response>

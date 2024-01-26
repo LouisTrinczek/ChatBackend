@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace Chat.Infrastructure.Migrations
+namespace Chat.Infrastructure.Database.Migrations
 {
     [DbContext(typeof(ChatDataContext))]
     partial class ChatDataContextModelSnapshot : ModelSnapshot
@@ -84,28 +84,33 @@ namespace Chat.Infrastructure.Migrations
                     b.Property<string>("Id")
                         .HasColumnType("varchar(255)");
 
+                    b.Property<bool>("Accepted")
+                        .HasColumnType("tinyint(1)");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime(6)");
 
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<string>("FriendId")
+                    b.Property<string>("ReceiverId")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<string>("SenderId")
+                        .IsRequired()
                         .HasColumnType("varchar(255)");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<string>("UserId")
-                        .HasColumnType("varchar(255)");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("FriendId");
+                    b.HasIndex("ReceiverId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("SenderId");
 
-                    b.ToTable("Friends");
+                    b.ToTable("UserFriends");
                 });
 
             modelBuilder.Entity("Chat.Domain.Entities.Message", b =>
@@ -302,17 +307,21 @@ namespace Chat.Infrastructure.Migrations
 
             modelBuilder.Entity("Chat.Domain.Entities.Friends", b =>
                 {
-                    b.HasOne("Chat.Domain.Entities.User", "Friend")
+                    b.HasOne("Chat.Domain.Entities.User", "Receiver")
+                        .WithMany("Friends")
+                        .HasForeignKey("ReceiverId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Chat.Domain.Entities.User", "Sender")
                         .WithMany()
-                        .HasForeignKey("FriendId");
+                        .HasForeignKey("SenderId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
-                    b.HasOne("Chat.Domain.Entities.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId");
+                    b.Navigation("Receiver");
 
-                    b.Navigation("Friend");
-
-                    b.Navigation("User");
+                    b.Navigation("Sender");
                 });
 
             modelBuilder.Entity("Chat.Domain.Entities.Message", b =>
@@ -392,6 +401,8 @@ namespace Chat.Infrastructure.Migrations
 
             modelBuilder.Entity("Chat.Domain.Entities.User", b =>
                 {
+                    b.Navigation("Friends");
+
                     b.Navigation("UserMessages");
 
                     b.Navigation("UserServers");

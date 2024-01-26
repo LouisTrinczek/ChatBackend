@@ -75,7 +75,7 @@
             Provides the REST Endpoints for Friends, such as adding friends, removing friends, and getting a friendlist
             </summary>
         </member>
-        <member name="M:Chat.API.Controllers.FriendsController.#ctor(Chat.Infrastructure.Database.ChatDataContext)">
+        <member name="M:Chat.API.Controllers.FriendsController.#ctor">
             <summary>
             Dependency Injection
             </summary>

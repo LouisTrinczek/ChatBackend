@@ -87,6 +87,8 @@ public static class ServiceBuilderExtensions
         self.Services.AddScoped<IServerRepository, ServerRepository>();
         self.Services.AddScoped<IChannelService, ChannelService>();
         self.Services.AddScoped<IChannelRepository, ChannelRepository>();
+        self.Services.AddScoped<IFriendRepository, FriendRepository>();
+        self.Services.AddScoped<IFriendsService, FriendsService>();
         self.Services.AddScoped<IJwtHandler, JwtHandler>();
         self.Services.AddHttpContextAccessor();
         self.Services.AddScoped<Lazy<IChannelService>>(

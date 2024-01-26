@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Chat.Infrastructure.Database.Migrations
 {
     [DbContext(typeof(ChatDataContext))]
-    [Migration("20240119183415_ChannelAndUserMessages")]
-    partial class ChannelAndUserMessages
+    [Migration("20240126205420_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -79,7 +79,7 @@ namespace Chat.Infrastructure.Database.Migrations
 
                     b.HasIndex("MessageId");
 
-                    b.ToTable("ChannelMessage");
+                    b.ToTable("ChannelMessages");
                 });
 
             modelBuilder.Entity("Chat.Domain.Entities.Friends", b =>
@@ -87,28 +87,33 @@ namespace Chat.Infrastructure.Database.Migrations
                     b.Property<string>("Id")
                         .HasColumnType("varchar(255)");
 
+                    b.Property<bool>("Accepted")
+                        .HasColumnType("tinyint(1)");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime(6)");
 
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<string>("FriendId")
+                    b.Property<string>("ReceiverId")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<string>("SenderId")
+                        .IsRequired()
                         .HasColumnType("varchar(255)");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<string>("UserId")
-                        .HasColumnType("varchar(255)");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("FriendId");
+                    b.HasIndex("ReceiverId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("SenderId");
 
-                    b.ToTable("Friends");
+                    b.ToTable("UserFriends");
                 });
 
             modelBuilder.Entity("Chat.Domain.Entities.Message", b =>
@@ -118,6 +123,10 @@ namespace Chat.Infrastructure.Database.Migrations
 
                     b.Property<string>("AuthorId")
                         .HasColumnType("varchar(255)");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("longtext");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime(6)");
@@ -211,12 +220,9 @@ namespace Chat.Infrastructure.Database.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("Chat.Domain.Entities.UserMessage", b =>
+            modelBuilder.Entity("Chat.Domain.Entities.UserMessages", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<string>("ChannelId")
                         .HasColumnType("varchar(255)");
 
                     b.Property<DateTime>("CreatedAt")
@@ -238,16 +244,14 @@ namespace Chat.Infrastructure.Database.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ChannelId");
-
                     b.HasIndex("MessageId");
 
                     b.HasIndex("ReceiverId");
 
-                    b.ToTable("UserMessage");
+                    b.ToTable("UserMessages");
                 });
 
-            modelBuilder.Entity("Chat.Domain.Entities.UserServer", b =>
+            modelBuilder.Entity("Chat.Domain.Entities.UserServers", b =>
                 {
                     b.Property<string>("UserId")
                         .HasColumnType("varchar(255)");
@@ -306,17 +310,21 @@ namespace Chat.Infrastructure.Database.Migrations
 
             modelBuilder.Entity("Chat.Domain.Entities.Friends", b =>
                 {
-                    b.HasOne("Chat.Domain.Entities.User", "Friend")
+                    b.HasOne("Chat.Domain.Entities.User", "Receiver")
+                        .WithMany("Friends")
+                        .HasForeignKey("ReceiverId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Chat.Domain.Entities.User", "Sender")
                         .WithMany()
-                        .HasForeignKey("FriendId");
+                        .HasForeignKey("SenderId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
-                    b.HasOne("Chat.Domain.Entities.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId");
+                    b.Navigation("Receiver");
 
-                    b.Navigation("Friend");
-
-                    b.Navigation("User");
+                    b.Navigation("Sender");
                 });
 
             modelBuilder.Entity("Chat.Domain.Entities.Message", b =>
@@ -337,12 +345,8 @@ namespace Chat.Infrastructure.Database.Migrations
                     b.Navigation("Owner");
                 });
 
-            modelBuilder.Entity("Chat.Domain.Entities.UserMessage", b =>
+            modelBuilder.Entity("Chat.Domain.Entities.UserMessages", b =>
                 {
-                    b.HasOne("Chat.Domain.Entities.Channel", null)
-                        .WithMany("UserMessages")
-                        .HasForeignKey("ChannelId");
-
                     b.HasOne("Chat.Domain.Entities.Message", "Message")
                         .WithMany("UserMessages")
                         .HasForeignKey("MessageId")
@@ -360,7 +364,7 @@ namespace Chat.Infrastructure.Database.Migrations
                     b.Navigation("Receiver");
                 });
 
-            modelBuilder.Entity("Chat.Domain.Entities.UserServer", b =>
+            modelBuilder.Entity("Chat.Domain.Entities.UserServers", b =>
                 {
                     b.HasOne("Chat.Domain.Entities.Server", "Server")
                         .WithMany("UserServers")
@@ -382,8 +386,6 @@ namespace Chat.Infrastructure.Database.Migrations
             modelBuilder.Entity("Chat.Domain.Entities.Channel", b =>
                 {
                     b.Navigation("ChannelMessages");
-
-                    b.Navigation("UserMessages");
                 });
 
             modelBuilder.Entity("Chat.Domain.Entities.Message", b =>
@@ -402,6 +404,8 @@ namespace Chat.Infrastructure.Database.Migrations
 
             modelBuilder.Entity("Chat.Domain.Entities.User", b =>
                 {
+                    b.Navigation("Friends");
+
                     b.Navigation("UserMessages");
 
                     b.Navigation("UserServers");

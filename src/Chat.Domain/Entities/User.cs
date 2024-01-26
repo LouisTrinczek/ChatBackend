@@ -31,6 +31,8 @@ public class User : BaseEntity
     public ICollection<UserServers> UserServers { get; set; } = new List<UserServers>();
     public ICollection<UserMessages> UserMessages { get; set; } = new List<UserMessages>();
 
+    public ICollection<Friends> Friends { get; set; } = new List<Friends>();
+
     public bool EmailIsValid()
     {
         string regex = @"^[^@\s]+@[^@\s]+\.(com|net|org|gov)$";

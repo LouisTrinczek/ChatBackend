@@ -7,7 +7,7 @@ namespace Chat.Application.Mappers;
 [Mapper]
 public partial class FriendsMapper
 {
-    public partial FriendsResponseDto FriendToFriendsResponseDto(Friends friends);
+    //public partial FriendsResponseDto FriendToFriendsResponseDto(Friends friends);
 
-    public partial Friends FriendsRequestDtoToFriends(FriendsRequestDto friendsRequestDto);
+    //public partial Friends FriendsRequestDtoToFriends(FriendsRequestDto friendsRequestDto);
 }

@@ -1,10 +1,12 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-
-namespace Chat.Domain.Entities;
+﻿namespace Chat.Domain.Entities;
 
 public class Friends : BaseEntity
 {
-    [Column] public User User { get; set; } = null!;
-    [Column] public User Friend { get; set; } = null!;
+    public string SenderId { get; set; } = null!;
+    public string ReceiverId { get; set; } = null!;
+
+    public User Sender { get; set; } = null!;
+    public User Receiver { get; set; } = null!;
+
+    public bool Accepted { get; set; } = false;
 }
