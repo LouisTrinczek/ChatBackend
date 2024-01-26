@@ -16,6 +16,8 @@ public class ChannelRepository : GenericRepository<Channel>, IChannelRepository
             .Channel.Where(c => c.Id == channelId)
             .Include(c => c.Server)
             .ThenInclude(c => c.Owner)
+            .Include(c => c.ChannelMessages)
+            .ThenInclude(c => c.Message)
             .FirstOrDefault(c => c.Id == channelId);
     }
 }

@@ -14,4 +14,13 @@ public partial class UserMapper
     public partial User UserUpdateDtoToUser(UserUpdateDto userUpdateDto);
 
     public partial UserResponseDto UserToUserResponseDto(User user);
+
+    public ICollection<UserResponseDto> UsersToUserResponseDtos(
+        ICollection<UserServers> userServers
+    )
+    {
+        return userServers
+            .Select(userServer => this.UserToUserResponseDto(userServer.User))
+            .ToList();
+    }
 }

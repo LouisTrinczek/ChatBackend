@@ -241,7 +241,6 @@ public class ChannelsController : ControllerBase
     {
         try
         {
-            // TODO: Return Messages with this request
             var channel = _channelService.GetChannelById(serverId, channelId);
             var channelResponseDto = _channelMapper.ServerChannelToChannelResponseDto(channel);
             return Ok(

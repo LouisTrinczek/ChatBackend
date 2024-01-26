@@ -16,4 +16,11 @@ public partial class MessageMapper
     public partial Message MessageCreateDtoToMessage(MessageCreateDto messageCreateDto);
 
     public partial Message MessageUpdateDtoToMessage(MessageUpdateDto messageUpdateDto);
+
+    public ICollection<MessageResponseDto> ChannelMessagesToMessageResponseDtos(
+        ICollection<ChannelMessage> channelMessages
+    )
+    {
+        return channelMessages.Select(cm => this.MessageToMessageResponseDto(cm.Message)).ToList();
+    }
 }

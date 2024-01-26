@@ -7,9 +7,12 @@ namespace Chat.Application.Mappers;
 [Mapper]
 public partial class ChannelMapper
 {
+    [UseMapper]
+    private readonly MessageMapper _messageMapper = new();
+
+    [MapProperty(nameof(Channel.ChannelMessages), nameof(ServerChannelResponseDto.Messages))]
     public partial ServerChannelResponseDto ServerChannelToChannelResponseDto(Channel channel);
 
-    [MapperIgnoreSourceValue(nameof(Channel.ChannelMessages))]
     public partial ServerChannelResponseDto[] ServerChannelCollectionToChannelResponseDtoList(
         ICollection<Channel> channel
     );
