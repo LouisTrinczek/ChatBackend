@@ -75,12 +75,12 @@
             Provides the REST Endpoints for Friends, such as adding friends, removing friends, and getting a friendlist
             </summary>
         </member>
-        <member name="M:Chat.API.Controllers.FriendsController.#ctor">
+        <member name="M:Chat.API.Controllers.FriendsController.#ctor(Chat.Application.Contracts.Services.IFriendsService,Microsoft.Extensions.Logging.ILogger{Chat.API.Controllers.FriendsController})">
             <summary>
             Dependency Injection
             </summary>
         </member>
-        <member name="M:Chat.API.Controllers.FriendsController.Add(Chat.Common.Dtos.FriendsRequestDto)">
+        <member name="M:Chat.API.Controllers.FriendsController.Add(Chat.Common.Dtos.FriendsRequestDto,System.String)">
             <summary>Adds a Friend</summary>
             <response code='200'>Successfully Added Friend</response>
             <response code='401'>If the user isn't logged in</response>

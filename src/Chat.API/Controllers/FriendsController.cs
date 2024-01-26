@@ -1,5 +1,8 @@
 ﻿using System.Net.Mime;
 using Chat.Application.Contracts.Repositories;
+using Chat.Application.Contracts.Services;
+using Chat.Application.Exceptions;
+using Chat.Application.Mappers;
 using Chat.Common.Dtos;
 using Chat.Common.Types;
 using Chat.Domain.Entities;
@@ -8,6 +11,7 @@ using Chat.Infrastructure.Database.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 namespace Chat.API.Controllers;
 
@@ -18,12 +22,20 @@ namespace Chat.API.Controllers;
 [ApiVersion("1")]
 [Route("/api/v{version:apiVersion}/users")]
 [Produces(MediaTypeNames.Application.Json)]
-public class FriendsController
+public class FriendsController : ControllerBase
 {
+    private readonly ILogger<FriendsController> _logger;
+    private readonly IFriendsService _friendsService;
+    private readonly UserMapper _userMapper = new UserMapper();
+
     /// <summary>
     /// Dependency Injection
     /// </summary>
-    public FriendsController() { }
+    public FriendsController(IFriendsService friendsService, ILogger<FriendsController> logger)
+    {
+        _friendsService = friendsService;
+        _logger = logger;
+    }
 
     /// <summary>Adds a Friend</summary>
     /// <response code='200'>Successfully Added Friend</response>
@@ -33,12 +45,54 @@ public class FriendsController
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    [Produces(typeof(ApiResponse<FriendsResponseDto>))]
+    [Produces(typeof(ApiResponse<UserResponseDto>))]
     [Consumes(typeof(FriendsRequestDto), MediaTypeNames.Application.Json)]
     [Authorize]
-    public string Add([FromBody] FriendsRequestDto friendsRequestDto)
+    public IActionResult Add(
+        [FromBody] FriendsRequestDto friendsRequestDto,
+        [FromRoute] string userId
+    )
     {
-        return "Not Implemented";
+        Console.WriteLine(userId);
+        try
+        {
+            User friend = _friendsService.AddFriend(userId, friendsRequestDto.FriendId);
+
+            var responseDto = _userMapper.UserToUserResponseDto(friend);
+
+            return Ok(
+                new ApiResponse<UserResponseDto>(
+                    ResponseStatus.Success,
+                    responseDto,
+                    new string[] { }
+                )
+            );
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e.ToString());
+            ObjectResult exception = e switch
+            {
+                BadRequestException
+                    => BadRequest(
+                        new ApiResponse<object>(
+                            ResponseStatus.Error,
+                            null,
+                            new string[] { e.Message }
+                        )
+                    ),
+                _
+                    => BadRequest(
+                        new ApiResponse<object>(
+                            ResponseStatus.Error,
+                            null,
+                            new string[] { "UnknownError" }
+                        )
+                    ),
+            };
+
+            return exception;
+        }
     }
 
     /// <summary>Removes a Friend</summary>
@@ -63,7 +117,7 @@ public class FriendsController
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    [Produces(typeof(ApiResponse<FriendsResponseDto[]>))]
+    [Produces(typeof(ApiResponse<UserResponseDto[]>))]
     [Authorize]
     public string Get()
     {
