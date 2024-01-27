@@ -86,7 +86,7 @@
             <response code='401'>If the user isn't logged in</response>
             <response code='403'>If the user tries to add a friend he's not permitted to</response>
         </member>
-        <member name="M:Chat.API.Controllers.FriendsController.Remove">
+        <member name="M:Chat.API.Controllers.FriendsController.Remove(System.String,System.String)">
             <summary>Removes a Friend</summary>
             <response code='200'>Successfully removed a friend</response>
             <response code='401'>If the user isn't logged in</response>

@@ -53,7 +53,6 @@ public class FriendsController : ControllerBase
         [FromRoute] string userId
     )
     {
-        Console.WriteLine(userId);
         try
         {
             User friend = _friendsService.AddFriend(userId, friendsRequestDto.FriendId);
@@ -104,9 +103,41 @@ public class FriendsController : ControllerBase
     [Produces(typeof(ApiResponse<string>))]
     [Consumes(MediaTypeNames.Application.Json)]
     [Authorize]
-    public string Remove()
+    public IActionResult Remove([FromRoute] string userId, [FromRoute] string friendId)
     {
-        return "Not Implemented";
+        try
+        {
+            _friendsService.RemoveFriend(userId, friendId);
+
+            return Ok(
+                new ApiResponse<UserResponseDto>(ResponseStatus.Success, null, new string[] { })
+            );
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e.ToString());
+            ObjectResult exception = e switch
+            {
+                BadRequestException
+                    => BadRequest(
+                        new ApiResponse<object>(
+                            ResponseStatus.Error,
+                            null,
+                            new string[] { e.Message }
+                        )
+                    ),
+                _
+                    => BadRequest(
+                        new ApiResponse<object>(
+                            ResponseStatus.Error,
+                            null,
+                            new string[] { "UnknownError" }
+                        )
+                    ),
+            };
+
+            return exception;
+        }
     }
 
     /// <summary>Gets the friend list</summary>

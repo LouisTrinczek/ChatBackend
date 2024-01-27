@@ -28,10 +28,7 @@ public class FriendsService : IFriendsService
 
     public User AddFriend(string senderId, string receiverId)
     {
-        if (senderId != _userService.GetAuthenticatedUserId())
-        {
-            throw new ForbiddenException("UserNotPermittedToSendFriendRequestForUser");
-        }
+        this.CheckIfCurrentUserIsSender(senderId);
 
         var sender = _userService.GetUserById(senderId);
         var receiver = _userService.GetUserById(receiverId);
@@ -54,10 +51,53 @@ public class FriendsService : IFriendsService
         return receiver;
     }
 
-    public void RemoveFriend(string friendId) { }
+    public void RemoveFriend(string senderId, string friendId)
+    {
+        this.CheckIfCurrentUserIsSender(senderId);
+        var transaction = _dbContext.Database.BeginTransaction();
+
+        var sender = _userService.GetUserById(senderId);
+        var receiver = _userService.GetUserById(friendId);
+
+        var friend = _friendRepository.GetFriendsFromSenderAndReceiver(sender, receiver);
+
+        try
+        {
+            if (friend == null)
+            {
+                throw new BadRequestException("UsersAreNotFriends");
+            }
+            _friendRepository.Delete(friend);
+            _friendRepository.Save();
+            transaction.Commit();
+        }
+        catch (Exception e)
+        {
+            transaction.Rollback();
+            throw;
+        }
+    }
 
     public ICollection<User> GetFriendList()
     {
         throw new NotImplementedException();
+    }
+
+    public ICollection<User> GetReceivedFriendRequestsList()
+    {
+        throw new NotImplementedException();
+    }
+
+    public ICollection<User> GetSentFriendRequestsList()
+    {
+        throw new NotImplementedException();
+    }
+
+    private void CheckIfCurrentUserIsSender(string senderId)
+    {
+        if (senderId != _userService.GetAuthenticatedUserId())
+        {
+            throw new ForbiddenException("UserNotPermittedToSendFriendRequestForUser");
+        }
     }
 }
