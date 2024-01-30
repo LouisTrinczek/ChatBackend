@@ -15,6 +15,10 @@ public partial class UserMapper
 
     public partial UserResponseDto UserToUserResponseDto(User user);
 
+    public partial ICollection<UserResponseDto> UserListToUserResponseDtoList(
+        ICollection<User> user
+    );
+
     public ICollection<UserResponseDto> UsersToUserResponseDtos(
         ICollection<UserServers> userServers
     )

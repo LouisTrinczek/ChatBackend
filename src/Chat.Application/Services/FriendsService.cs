@@ -33,6 +33,13 @@ public class FriendsService : IFriendsService
         var sender = _userService.GetUserById(senderId);
         var receiver = _userService.GetUserById(receiverId);
 
+        var friend = _friendRepository.GetFriendsFromSenderAndReceiver(sender, receiver);
+
+        if (friend is not null)
+        {
+            throw new ForbiddenException("UsersAreAlreadyFriends");
+        }
+
         var transaction = _dbContext.Database.BeginTransaction();
         try
         {
@@ -51,22 +58,15 @@ public class FriendsService : IFriendsService
         return receiver;
     }
 
-    public void RemoveFriend(string senderId, string friendId)
+    public void RemoveFriend(string senderId, string receiverId)
     {
         this.CheckIfCurrentUserIsSender(senderId);
         var transaction = _dbContext.Database.BeginTransaction();
 
-        var sender = _userService.GetUserById(senderId);
-        var receiver = _userService.GetUserById(friendId);
-
-        var friend = _friendRepository.GetFriendsFromSenderAndReceiver(sender, receiver);
+        var friend = this.GetFriends(senderId, receiverId);
 
         try
         {
-            if (friend == null)
-            {
-                throw new BadRequestException("UsersAreNotFriends");
-            }
             _friendRepository.Delete(friend);
             _friendRepository.Save();
             transaction.Commit();
@@ -78,19 +78,25 @@ public class FriendsService : IFriendsService
         }
     }
 
-    public ICollection<User> GetFriendList()
+    public ICollection<User> GetFriendList(string userId)
     {
-        throw new NotImplementedException();
+        this.CheckIfCurrentUserIsSender(userId);
+
+        return _friendRepository.GetFriendsList(userId);
     }
 
-    public ICollection<User> GetReceivedFriendRequestsList()
+    public ICollection<User> GetReceivedFriendRequestsList(string userId)
     {
-        throw new NotImplementedException();
+        this.CheckIfCurrentUserIsSender(userId);
+
+        return _friendRepository.GetReceivedFriendRequests(userId);
     }
 
-    public ICollection<User> GetSentFriendRequestsList()
+    public ICollection<User> GetSentFriendRequestsList(string userId)
     {
-        throw new NotImplementedException();
+        this.CheckIfCurrentUserIsSender(userId);
+
+        return _friendRepository.GetSentFriendRequests(userId);
     }
 
     private void CheckIfCurrentUserIsSender(string senderId)
@@ -99,5 +105,20 @@ public class FriendsService : IFriendsService
         {
             throw new ForbiddenException("UserNotPermittedToSendFriendRequestForUser");
         }
+    }
+
+    private Friends GetFriends(string senderId, string receiverId)
+    {
+        var sender = _userService.GetUserById(senderId);
+        var receiver = _userService.GetUserById(receiverId);
+
+        var friend = _friendRepository.GetFriendsFromSenderAndReceiver(sender, receiver);
+
+        if (friend == null)
+        {
+            throw new ForbiddenException("UsersAreNotFriends");
+        }
+
+        return friend;
     }
 }

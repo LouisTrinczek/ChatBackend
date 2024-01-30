@@ -10,12 +10,34 @@ public class FriendRepository : GenericRepository<Friends>, IFriendRepository
     public FriendRepository(ChatDataContext chatDataContext)
         : base(chatDataContext) { }
 
-    public List<Friends> GetFriendsList(string senderId, string friendId)
+    public List<User> GetFriendsList(string userId)
     {
         return _table
             .Include(f => f.Receiver)
             .Include(f => f.Sender)
-            .Where(f => f.Sender.Id == senderId)
+            .Where(f => f.Sender.Id == userId)
+            .Where(f => f.Accepted == true)
+            .Select(f => f.Receiver)
+            .ToList();
+    }
+
+    public List<User> GetReceivedFriendRequests(string userId)
+    {
+        return _table
+            .Include(f => f.Receiver)
+            .Include(f => f.Sender)
+            .Where(f => f.Receiver.Id == userId)
+            .Select(f => f.Sender)
+            .ToList();
+    }
+
+    public List<User> GetSentFriendRequests(string userId)
+    {
+        return _table
+            .Include(f => f.Receiver)
+            .Include(f => f.Sender)
+            .Where(f => f.Sender.Id == userId)
+            .Select(f => f.Receiver)
             .ToList();
     }
 

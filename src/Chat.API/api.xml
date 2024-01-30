@@ -84,16 +84,28 @@
             <summary>Adds a Friend</summary>
             <response code='200'>Successfully Added Friend</response>
             <response code='401'>If the user isn't logged in</response>
-            <response code='403'>If the user tries to add a friend he's not permitted to</response>
+            <response code='403'>If the user tries to add a friend he's not permitted to, or if the users are already friends</response>
         </member>
         <member name="M:Chat.API.Controllers.FriendsController.Remove(System.String,System.String)">
             <summary>Removes a Friend</summary>
             <response code='200'>Successfully removed a friend</response>
             <response code='401'>If the user isn't logged in</response>
         </member>
-        <member name="M:Chat.API.Controllers.FriendsController.Get">
+        <member name="M:Chat.API.Controllers.FriendsController.GetFriendList(System.String)">
             <summary>Gets the friend list</summary>
             <response code='200'>Successfully Get Server</response>
+            <response code='401'>If the user isn't logged in</response>
+            <response code='403'>If the user tries to get a friend list he's not permitted to</response>
+        </member>
+        <member name="M:Chat.API.Controllers.FriendsController.GetReceivedFriendRequests(System.String)">
+            <summary>Gets the received friend request list</summary>
+            <response code='200'>Successfully Get received friend quests</response>
+            <response code='401'>If the user isn't logged in</response>
+            <response code='403'>If the user tries to get a friend list he's not permitted to</response>
+        </member>
+        <member name="M:Chat.API.Controllers.FriendsController.GetSentFriendRequests(System.String)">
+            <summary>Gets the sent friend request list</summary>
+            <response code='200'>Successfully Get sent request friendlist</response>
             <response code='401'>If the user isn't logged in</response>
             <response code='403'>If the user tries to get a friend list he's not permitted to</response>
         </member>

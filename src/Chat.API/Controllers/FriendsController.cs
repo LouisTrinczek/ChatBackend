@@ -40,7 +40,7 @@ public class FriendsController : ControllerBase
     /// <summary>Adds a Friend</summary>
     /// <response code='200'>Successfully Added Friend</response>
     /// <response code='401'>If the user isn't logged in</response>
-    /// <response code='403'>If the user tries to add a friend he's not permitted to</response>
+    /// <response code='403'>If the user tries to add a friend he's not permitted to, or if the users are already friends</response>
     [HttpPost("{userId}/[controller]")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -72,6 +72,14 @@ public class FriendsController : ControllerBase
             _logger.LogError(e.ToString());
             ObjectResult exception = e switch
             {
+                ForbiddenException
+                    => new Forbidden(
+                        new ApiResponse<object>(
+                            ResponseStatus.Error,
+                            null,
+                            new string[] { e.Message }
+                        )
+                    ),
                 BadRequestException
                     => BadRequest(
                         new ApiResponse<object>(
@@ -150,8 +158,149 @@ public class FriendsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [Produces(typeof(ApiResponse<UserResponseDto[]>))]
     [Authorize]
-    public string Get()
+    public IActionResult GetFriendList([FromRoute] string userId)
     {
-        return "String";
+        try
+        {
+            var friendList = _friendsService.GetFriendList(userId);
+            var responseDto = _userMapper.UserListToUserResponseDtoList(friendList);
+
+            return Ok(
+                new ApiResponse<ICollection<UserResponseDto>>(
+                    ResponseStatus.Success,
+                    responseDto,
+                    new string[] { }
+                )
+            );
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e.ToString());
+            ObjectResult exception = e switch
+            {
+                BadRequestException
+                    => BadRequest(
+                        new ApiResponse<object>(
+                            ResponseStatus.Error,
+                            null,
+                            new string[] { e.Message }
+                        )
+                    ),
+                _
+                    => BadRequest(
+                        new ApiResponse<object>(
+                            ResponseStatus.Error,
+                            null,
+                            new string[] { "UnknownError" }
+                        )
+                    ),
+            };
+
+            return exception;
+        }
+    }
+
+    /// <summary>Gets the received friend request list</summary>
+    /// <response code='200'>Successfully Get received friend quests</response>
+    /// <response code='401'>If the user isn't logged in</response>
+    /// <response code='403'>If the user tries to get a friend list he's not permitted to</response>
+    [HttpGet("{userId}/[controller]/received-requests")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [Produces(typeof(ApiResponse<UserResponseDto[]>))]
+    [Authorize]
+    public IActionResult GetReceivedFriendRequests([FromRoute] string userId)
+    {
+        try
+        {
+            var friendList = _friendsService.GetReceivedFriendRequestsList(userId);
+            var responseDto = _userMapper.UserListToUserResponseDtoList(friendList);
+
+            return Ok(
+                new ApiResponse<ICollection<UserResponseDto>>(
+                    ResponseStatus.Success,
+                    responseDto,
+                    new string[] { }
+                )
+            );
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e.ToString());
+            ObjectResult exception = e switch
+            {
+                BadRequestException
+                    => BadRequest(
+                        new ApiResponse<object>(
+                            ResponseStatus.Error,
+                            null,
+                            new string[] { e.Message }
+                        )
+                    ),
+                _
+                    => BadRequest(
+                        new ApiResponse<object>(
+                            ResponseStatus.Error,
+                            null,
+                            new string[] { "UnknownError" }
+                        )
+                    ),
+            };
+
+            return exception;
+        }
+    }
+
+    /// <summary>Gets the sent friend request list</summary>
+    /// <response code='200'>Successfully Get sent request friendlist</response>
+    /// <response code='401'>If the user isn't logged in</response>
+    /// <response code='403'>If the user tries to get a friend list he's not permitted to</response>
+    [HttpGet("{userId}/[controller]/sent-requests")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [Produces(typeof(ApiResponse<UserResponseDto[]>))]
+    [Authorize]
+    public IActionResult GetSentFriendRequests([FromRoute] string userId)
+    {
+        try
+        {
+            var friendList = _friendsService.GetSentFriendRequestsList(userId);
+            var responseDto = _userMapper.UserListToUserResponseDtoList(friendList);
+
+            return Ok(
+                new ApiResponse<ICollection<UserResponseDto>>(
+                    ResponseStatus.Success,
+                    responseDto,
+                    new string[] { }
+                )
+            );
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e.ToString());
+            ObjectResult exception = e switch
+            {
+                BadRequestException
+                    => BadRequest(
+                        new ApiResponse<object>(
+                            ResponseStatus.Error,
+                            null,
+                            new string[] { e.Message }
+                        )
+                    ),
+                _
+                    => BadRequest(
+                        new ApiResponse<object>(
+                            ResponseStatus.Error,
+                            null,
+                            new string[] { "UnknownError" }
+                        )
+                    ),
+            };
+
+            return exception;
+        }
     }
 }
