@@ -78,6 +78,26 @@ public class FriendsService : IFriendsService
         }
     }
 
+    public void AcceptFriendRequest(string userId, string friendId)
+    {
+        var friendship = this.GetFriends(userId, friendId);
+        this.CheckIfCurrentUserIsReceiver(friendship.Receiver.Id);
+
+        var transaction = _dbContext.Database.BeginTransaction();
+
+        try
+        {
+            friendship.Accepted = true;
+            _friendRepository.Save();
+            transaction.Commit();
+        }
+        catch (Exception e)
+        {
+            transaction.Rollback();
+            throw;
+        }
+    }
+
     public ICollection<User> GetFriendList(string userId)
     {
         this.CheckIfCurrentUserIsSender(userId);
@@ -103,7 +123,15 @@ public class FriendsService : IFriendsService
     {
         if (senderId != _userService.GetAuthenticatedUserId())
         {
-            throw new ForbiddenException("UserNotPermittedToSendFriendRequestForUser");
+            throw new ForbiddenException("UserIsNotFriendRequestSender");
+        }
+    }
+
+    private void CheckIfCurrentUserIsReceiver(string receiverId)
+    {
+        if (receiverId != _userService.GetAuthenticatedUserId())
+        {
+            throw new ForbiddenException("UserIsNotFriendRequestReceiver");
         }
     }
 
