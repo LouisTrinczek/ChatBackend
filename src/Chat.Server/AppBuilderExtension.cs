@@ -15,6 +15,7 @@ public static class AppBuilderExtension
 
         self.MapHub<ChatHub>("/chat");
 
+        self.UseCors(c => c.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
         self.UseRouting();
         self.UseHttpsRedirection();
         self.UseWebSockets();
